@@ -57,8 +57,7 @@ function BookingForm() {
                     // onFocus={() => setErrors({ ...errors, ["roomTypeError"]: "" })}
                     />
                 </Grid>
-
-            </Box>
+             </Box>
             <Button onClick={handleOpen}>+Add guest</Button>
             <Modal
                 open={open}
