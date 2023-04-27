@@ -1,0 +1,27 @@
+.connectWithTravelers{
+    width: 100%;
+    max-width: 1024px;
+    display: flex;
+
+}
+
+.connectTitleContainer{
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    
+}
+.connectWithTravelItem{
+   margin-right: 20px;
+}
+
+.connectTitle{
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.connectSub .connectTravelers{
+    font-weight: 200;
+    font-size: 12px;
+}
