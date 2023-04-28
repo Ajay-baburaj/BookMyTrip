@@ -3,15 +3,16 @@ import {
     TextField, Typography, Radio, RadioGroup, FormControlLabel, Box, MenuItem,
     Select, FormControl, InputLabel, Grid, Button, Modal
 } from '@mui/material'
+import axios from 'axios'
 
 import { useSelector } from 'react-redux'
+import { confirmBooking } from '../utils/APIRoutes'
 
 function BookingForm() {
     const user = useSelector(state => state?.user?.user)
+    const hotel = useSelector(state=>state?.booking?.details)
     const [open, setOpen] = React.useState(false);
     const [add, setAdd] = useState(false)
-    const [email, setEmail] = useState()
-    const [mobile, setMobile] = useState()
     const [selectedValue, setSelectedValue] = useState('myself')
     const [guest, setGuest] = useState([])
     const [title, setTitle] = useState('Mr')
@@ -76,8 +77,11 @@ function BookingForm() {
         return true;
     }
 
-    const handleBooking =()=>{
-       alert('call is coming')
+    const handleBooking =async()=>{
+        console.log(data)
+        await axios.post(`${confirmBooking}/`,{data}).then((response)=>{
+            console.log(response)
+        })
     }
 
 
@@ -93,7 +97,7 @@ function BookingForm() {
         boxShadow: 24,
         p: 4,
     };
-    console.log(mobile, email)
+   
 
     return (
         <Box sx={{ padding: "1.5rem", boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.25)' }}>

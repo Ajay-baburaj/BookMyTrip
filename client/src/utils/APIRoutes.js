@@ -10,3 +10,4 @@ export const getHotels = `${host}/hotels`
 export const getHotelImagesURL = `${host}/get/images`
 export const getRoomCmpltURL = `${host}/get/details`
 export const bookRoomUrl = `${host}/book/room` 
+export const confirmBooking = `${host}/confirm/booking`

@@ -154,7 +154,6 @@ module.exports.validateMobile = async (req, res, next) => {
     console.log(mobileForOtp)
     try {
         const mobileCheck = await users.findOne({ phone: mobileForOtp })
-        console.log(mobileCheck.phone)
         if (mobileForOtp == mobileCheck.phone) {
             sendOtp(mobileCheck.phone)
             const mobile = mobileCheck.phone
@@ -227,7 +226,6 @@ module.exports.getHotels = async (req, res, next) => {
 }
 
 module.exports.getHotelImages = async (req, res, next) => {
-    console.log(req.query.id)
     const hotelData = await hotelModel.findOne({ _id: new mongoose.Types.ObjectId(req.query.id) })
     function hotelImages(hotelData) {
         return new Promise((resolve, reject) => {
@@ -256,9 +254,7 @@ module.exports.getHotelImages = async (req, res, next) => {
 module.exports.getSingleHotelData = async (req, res, next) => {
     try {
         const details = await hotelModel.findById(req.params.id)
-        console.log("details", details)
         const getCompeleteDtls = await getWholeImagesOfHotel(details)
-        console.log(getCompeleteDtls)
         res.status(201).json(getCompeleteDtls)
     } catch (err) {
         console.log(err.message)
@@ -266,7 +262,6 @@ module.exports.getSingleHotelData = async (req, res, next) => {
 }
 
 module.exports.countByCity = async(req,res,next)=>{
-    console.log("call is coming")
     const cities = req.query.cities.split(",");
     try{
         const list = await Promise.all(
@@ -303,9 +298,14 @@ module.exports.bookRoom = async(req,res,next)=>{
     try{
 
         const {userId,roomId,hotelId,date,destination,options} = req.body
-        console.log(userId)
         const checkInDate = new Date(date[0]?.startDate)
         const checkOutDate = new Date(date[0]?.endDate)
+        const oneDay = 24 * 60 * 60 * 1000;
+        const dateOptions = {weekday:'short',day:'numeric',month:'short',year:'numeric'}
+        const formattedCheckIn= checkInDate.toLocaleDateString('en-Us',dateOptions)
+        const formattedCheckOut= checkInDate.toLocaleDateString('en-Us',dateOptions)
+        const diffDays = Math.round(Math.abs(checkInDate- checkOutDate) / oneDay)
+        console.log(diffDays)
     
         const bookingData = await bookingModel.create({
           user:userId,
@@ -313,6 +313,7 @@ module.exports.bookRoom = async(req,res,next)=>{
           hotel:hotelId,
           checkInDate,
           checkOutDate,
+          days:diffDays,
           guests:options?.adult+options?.children, 
         })
         res.status(200).json(bookingData)
@@ -321,7 +322,9 @@ module.exports.bookRoom = async(req,res,next)=>{
     }
   }
 
-//   const dateOptions = {weekday:'short',day:'numeric',month:'short',year:'numeric'}
-//     const formattedCheckIn= checkInDate.toLocaleDateString('en-Us',dateOptions)
-//     const formattedCheckOut= checkInDate.toLocaleDateString('en-Us',dateOptions)
+  module.exports.confirmBooking = async(req,res,next)=>{
+    console.log("call is coming here")
+  }
+
+
 
