@@ -1,6 +1,5 @@
 const router = require('express').Router()
-const { bookRoom } = require('../controllers/hotelController')
-const {register, login, forgotPassword,resetPassword, validateMobile,otpSignIn,getHotels,getHotelImages,getSingleHotelData, countByCity} = require("../controllers/userController")
+const {register,bookRoom, login, forgotPassword,resetPassword, validateMobile,otpSignIn,getHotels,getHotelImages,getSingleHotelData, countByCity} = require("../controllers/userController")
 
 router.post("/register",register)
 router.post("/login",login)

@@ -24,6 +24,12 @@ const bookingSchema = new mongoose.Schema({
     guests:{
         type:Number,
     },
+    guestDetails:{
+        type:Array
+    },
+    bookedBy:{
+        type:String
+    },
     totalPrice:{
         type:Number,
     },

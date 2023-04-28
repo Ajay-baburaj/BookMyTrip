@@ -10,7 +10,6 @@ const { getFullDetails, getRoomDetails } = require('../helper/loginChecker')
 const { generateToken, verify_JWT_Token } = require("../helper/jwt");
 const { response } = require('express');
 const maxAge = 3 * 24 * 60 * 60
-const bookingModel = require('../model/bookingModel')
 
 
 module.exports.register = async (req, res, next) => {
@@ -453,25 +452,5 @@ module.exports.deleteRoomImages = async(req,res,next)=>{
       })
 }
 
-module.exports.bookRoom = async(req,res,next)=>{
-  const {userId,roomId,hotelId,date,destination,options} = req.body
-  console.log(userId)
-  const checkInDate = new Date(date[0]?.startDate)
-  const checkOutDate = new Date(date[0]?.endDate)
-  const dateOptions = {weekday:'short',day:'numeric',month:'short',year:'numeric'}
-  const formattedCheckIn= checkInDate.toLocaleDateString('en-Us',dateOptions)
-  const formattedCheckOut= checkInDate.toLocaleDateString('en-Us',dateOptions)
 
-  const bookingData = await bookingModel.create({
-    user:userId,
-    room:roomId,
-    hotel:hotelId,
-    checkInDate,
-    checkOutDate,
-    guests:options?.adult+options?.children, 
-  })
-  bookingData.checkInDate=formattedCheckIn
-  bookingData.checkOutDate = formattedCheckOut
-  res.status(200).json(bookingData)
-}
 

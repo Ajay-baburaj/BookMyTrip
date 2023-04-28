@@ -221,8 +221,6 @@ module.exports.cmpltDetails = async (req,res,next)=>{
       })
     }
     await hotelImages(hotelData)
-    const cacheKey = 'data'
-    client
     res.status(200).json({ hotelData })
 }
 
