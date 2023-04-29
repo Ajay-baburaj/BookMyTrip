@@ -24,6 +24,9 @@ const bookingSchema = new mongoose.Schema({
     days:{
         type:Number,
     },
+    total:{
+        type:Number,
+    },
     guests:{
         type:Number,
     },

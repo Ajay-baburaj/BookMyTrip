@@ -27,6 +27,7 @@
     "node-redis": "^0.1.7",
     "nodemailer": "^6.9.1",
     "nodemon": "^2.0.21",
+    "razorpay": "^2.8.6",
     "redis": "^4.6.5",
     "sharp": "^0.32.0",
     "twilio": "^4.8.0",

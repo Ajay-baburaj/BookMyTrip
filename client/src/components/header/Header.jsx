@@ -1,6 +1,6 @@
 import { faBed, faCab, faCalendar, faParachuteBox, faPerson, faPlane } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useSelector } from 'react-redux'
 import './header.css'
@@ -10,6 +10,7 @@ import 'react-date-range/dist/theme/default.css'; // theme css file
 import { format } from "date-fns"
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast'
+
 
 function Header({ type }) {
 
@@ -29,17 +30,40 @@ function Header({ type }) {
   const [destination, setDestination] = useState("")
   const [options, setOption] = useState({ adult: 1, children: 0, room: 1 })
   const [openOptions, setOpenOptions] = useState(false)
+  const [values, setValues] = useState(1)
+  const [roomCount, setRoomCount] = useState(1)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+
   const handleOption = (name, operation) => {
     setOption((prev) => {
-      return {
-        ...prev,
-        [name]: operation === "i" ? options[name] + 1 : options[name] - 1
-      }
-    })
+      calculateRoomCount()
+        return {
+          ...prev,
+          [name]: operation === "i" ? options[name] + 1 : options[name] - 1
+        }
+        
+      })
   }
+
+
+  function calculateRoomCount() {
+
+    const ratio = 1.5; // ratio of 2 adults to 1 child per room
+    const total = options.adult+options.children
+    const roomsNeeded = Math.ceil(total / ratio);
+    console.log("total",total)
+    console.log("rooms",roomsNeeded)
+    setRoomCount(roomsNeeded)
+  }
+
+  useEffect(() => {
+    setOption(prev => ({
+      ...prev,
+      ['room']: roomCount
+    }));
+  }, [roomCount]);
 
   console.log(date, options)
 

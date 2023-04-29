@@ -8,6 +8,9 @@ const { default: mongoose } = require('mongoose')
 const { getFromS3 } = require('../helper/s3Bucket')
 const { getWholeImagesOfHotel } = require('../helper/loginChecker')
 const bookingModel = require('../model/bookingModel')
+const Razorpay = require('razorpay');
+const {instance, generateRazorpay, verifyPayment} = require('../helper/razorpay')
+
 
 
 
@@ -305,8 +308,11 @@ module.exports.bookRoom = async(req,res,next)=>{
         const formattedCheckIn= checkInDate.toLocaleDateString('en-Us',dateOptions)
         const formattedCheckOut= checkInDate.toLocaleDateString('en-Us',dateOptions)
         const diffDays = Math.round(Math.abs(checkInDate- checkOutDate) / oneDay)
-        console.log(diffDays)
+        const hotel = await hotelModel.findById({_id:hotelId})
+        const roomdata = hotel?.rooms.find((room) => room._id == roomId)
+        const total = parseInt(diffDays)*parseInt(roomdata.price)
     
+        console.log(total)
         const bookingData = await bookingModel.create({
           user:userId,
           room:roomId,
@@ -314,6 +320,7 @@ module.exports.bookRoom = async(req,res,next)=>{
           checkInDate,
           checkOutDate,
           days:diffDays,
+          total,
           guests:options?.adult+options?.children, 
         })
         res.status(200).json(bookingData)
@@ -322,8 +329,23 @@ module.exports.bookRoom = async(req,res,next)=>{
     }
   }
 
+
+
   module.exports.confirmBooking = async(req,res,next)=>{
-    console.log("call is coming here")
+    try{
+        const bookingId = req.params.id
+        const details = await bookingModel.findById({_id:bookingId})
+        const result = await generateRazorpay(bookingId,details?.total)
+        console.log(result)
+        res.status(200).json(result)                                                                                 
+    }catch(err){
+        console.log(err)
+    }
+  }
+
+  module.exports.verifyPayment =(req,res)=>{
+    console.log("call is coming inside verifypayment")
+    const payment = verifyPayment(req.body)
   }
 
 

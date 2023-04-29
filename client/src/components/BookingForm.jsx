@@ -6,7 +6,7 @@ import {
 import axios from 'axios'
 
 import { useSelector } from 'react-redux'
-import { confirmBooking } from '../utils/APIRoutes'
+import { confirmBooking, verifyUrl } from '../utils/APIRoutes'
 
 function BookingForm() {
     const user = useSelector(state => state?.user?.user)
@@ -77,11 +77,99 @@ function BookingForm() {
         return true;
     }
 
+    function loadScript(src) {
+        return new Promise((resolve) => {
+            const script = document.createElement("script");
+            script.src = src;
+            script.onload = () => {
+                resolve(true);
+            };
+            script.onerror = () => {
+                resolve(false);
+            };
+            document.body.appendChild(script);
+        });
+    }
+
+    // const initPayment =(hotel)=>{
+    //     const options = {
+	// 		key: "rzp_test_wBILsF6sI8t8aF",
+	// 		amount: hotel.amount,
+	// 		currency: "INR",
+	// 		name:"bookMyTri PVT Limited",
+	// 		description: "Test Transaction",
+	// 		order_id: hotel._id,
+	// 		handler: async (response) => {
+	// 			try {
+	// 				const { data } = await axios.post(verifyUrl, response);
+	// 				console.log(data);
+	// 			} catch (error) {
+	// 				console.log(error);
+	// 			}
+	// 		},
+	// 		theme: {
+	// 			color: "#3399cc",
+	// 		},
+	// 	};
+	// 	const rzp1 = new window.Razorpay(options);
+	// 	rzp1.open();
+    // }
+    
+    
+    async function displayRazorpay(data) {
+        alert(data.id)
+        const res = await loadScript(
+            "https://checkout.razorpay.com/v1/checkout.js"
+            );
+
+        if (!res) {
+            alert("Razorpay SDK failed to load. Are you online?");
+            return;
+        }
+
+
+       
+
+        const options = {
+            key: "rzp_test_wBILsF6sI8t8aF", // Enter the Key ID generated from the Dashboard
+            amount: hotel?.total,
+            currency: "INR",
+            name: "bookyMyTrip",
+            description: "Test Transaction",
+            // image: { logo },
+            order_id: data.id,
+            handler: async function (response) {
+                const data = {
+                    orderCreationId: data.id,
+                    razorpayPaymentId: response.razorpay_payment_id,
+                    razorpayOrderId: response.razorpay_order_id,
+                    razorpaySignature: response.razorpay_signature,
+                };
+
+                // const result = await axios.post("http://localhost:5000/payment/success", data);
+
+                // alert(result.data.msg);
+            },
+            theme: {
+                color: "#61dafb",
+            },
+        };
+
+        const paymentObject = new window.Razorpay(options);
+        paymentObject.open();
+    }
+
     const handleBooking =async()=>{
-        console.log(data)
-        await axios.post(`${confirmBooking}/`,{data}).then((response)=>{
-            console.log(response)
-        })
+        try{
+
+            await axios.post(`${confirmBooking}/${hotel._id}`,{data}).then((response)=>{
+                // initPayment(hotel,response)
+                displayRazorpay(response.data)
+    
+            })
+        }catch(err){
+            console.log(err)
+        }
     }
 
 
