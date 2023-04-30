@@ -10,6 +10,8 @@ import Booking from './Pages/booking/Booking';
 import Payment from './Pages/payment/Payment';
 import ResetPassword from './Pages/resetPassword/ResetPassword';
 import OtpEnter from './Pages/otp/OtpEnter';
+import Profile from './Pages/Profile';
+import OrderSuccessfull from './Pages/OrderSuccessfull'
 
 function App() {
   return (
@@ -24,6 +26,9 @@ function App() {
         <Route element={<Payment/>} exact path="/payment" />
         <Route element ={<ResetPassword/>} exact path="/reset/password/:id/:token"/>
         <Route element = {<OtpEnter/>} exact path="/otp/enter/:mobile"/>
+        <Route element={<Profile />} exact path='/profile'/>
+        <Route element={<OrderSuccessfull />} exact path ='/order/sucess' />
+        {/* <Route element={<BookingDetails/>} exact path='/booking/details/:id'/> */}
       </Routes>
     </BrowserRouter>
     

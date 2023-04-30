@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { Box, Button, Container, Grid, Typography } from '@mui/material'
 import { Link } from 'react-router-dom'
-import SearchItem from '../../components/searchItem/SearchItem'
+import { PersonOutline } from '@material-ui/icons';
+import BedIcon from '@material-ui/icons/Hotel';
+import MailIcon from '@material-ui/icons/Mail';
 
 
 function BookedRoom(props) {
     const { details, room } = props
+    console.log(details)
     const checkInDate = new Date(details?.checkInDate).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
     const checkOutDate = new Date(details?.checkOutDate).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
     const oneDay = 24 * 60 * 60 * 1000;
@@ -33,11 +36,35 @@ function BookedRoom(props) {
                     </Container>
                     <Box component="span" sx={{ color: "#22779c", fontSize: "14px", fontWeight: "500", gap: "20px" }}>{`Total length of stay: ${diffDays} day`}</Box>
                 </Container>
-                <Container sx={{ display: 'flex', flexDirection: 'column', marginBottom: 3 }}>
+                <Container sx={{ display: 'flex', flexDirection: 'column', marginBottom: 3,gap:'10px' }}>
                     <Typography sx={{ fontSize: "16px", fontWeight: "500" }}>{`Room Type: ${room && room?.roomType}`}</Typography>
-                    <Box sx={{display:'flex',gap:'5px'}}>
-                        <Typography sx={{ fontSize: "16px", fontWeight: "500" }}>{`Price: ₹ ${room && parseInt(room?.price)*parseInt(diffDays)} `}</Typography>
-                        <Typography sx={{ color: 'text.disabled' }}>+ gst</Typography>
+                    <Box sx={{ display: 'flex', gap: '1rem' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                            <Typography sx={{ fontSize: "14px" }}>No of the guests</Typography>
+                            <PersonOutline />
+                            <Typography sx={{ fontSize: "14px" }}>3</Typography>
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                            <Typography sx={{ fontSize: "14px" }}>Rooms</Typography>
+                            <BedIcon />
+                            <Typography sx={{ fontSize: "14px" }}>2</Typography>
+                        </Box>
+                    </Box>
+                    <Box sx={{ display: 'flex', gap: '5px' }}>
+                        <Typography sx={{ fontSize: "16px", fontWeight: "500" }}>{`Price: ₹ ${room && parseInt(room?.price) * parseInt(diffDays)} `}</Typography>
+                        <Typography sx={{ color: 'text.disabled' }}>( 12% gst included)</Typography>
+                    </Box>
+                    <Box sx={{ width: '100%', padding: '15px', backgroundColor: '#DBDFEA', borderRadius: '5px' }}>
+                        <Typography sx={{ fontSize: "14px", fontWeight: "bold" }}>Booked by:</Typography>
+                        <Box sx={{ display: 'flex', gap: '15px' }}>
+                            <Typography sx={{ fontSize: "14px", fontWeight: "bold" }}>Ajay Baburaj</Typography>
+                            <Box sx={{display:'flex',gap:'10px'}}>
+                                <MailIcon />
+                                <Typography sx={{ fontSize: "14px" }}>ajaybaburajp@gmail.com</Typography>
+                            </Box>
+                           
+                        </Box>
+                        <Typography sx={{ fontSize: "14px", fontWeight: "bold" }}>Guets {4}</Typography>
                     </Box>
                     <Link >change your selection</Link>
                 </Container>
