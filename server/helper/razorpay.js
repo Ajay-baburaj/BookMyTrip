@@ -11,7 +11,7 @@ module.exports.generateRazorpay = (orderId, total) => {
     });
 
     const options = {
-      amount: total * 100,
+      amount: total*100,
       currency: "INR",
       receipt: orderId
     }
@@ -31,7 +31,7 @@ module.exports.verifyPayment = (reqBody) => {
     const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = reqBody;
     const sign = razorpay_order_id + "|" + razorpay_payment_id;
     const expectedSign = crypto
-      .createHmac("sha256", process.env.KEY_SECRET)
+      .createHmac("sha256", "8C84FoP90AqSyOjByzG9WHTR")
       .update(sign.toString())
       .digest("hex");
 
@@ -41,8 +41,4 @@ module.exports.verifyPayment = (reqBody) => {
       reject({ status: false, message: "Invalid signature sent!" });
     }
   })
-    .then(() => { }).catch((err) => {
-      console.log(err.message)
-      resolve(err.message)
-    })
 }

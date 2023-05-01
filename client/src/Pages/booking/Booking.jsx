@@ -32,15 +32,6 @@ function Booking() {
 
     }
 
-    useEffect(() => {
-        const roomdata = hotel?.rooms.find((room) => room._id == details.room)
-        console.log(roomdata)
-        setRoom(roomdata)
-    }, [hotel])
-
-
-
-
     return (
         <>
             <Navbar />

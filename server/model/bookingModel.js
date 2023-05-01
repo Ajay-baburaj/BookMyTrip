@@ -24,6 +24,9 @@ const bookingSchema = new mongoose.Schema({
     days:{
         type:Number,
     },
+    numberOfRooms:{
+        type:Number
+    },
     total:{
         type:Number,
     },
@@ -43,6 +46,9 @@ const bookingSchema = new mongoose.Schema({
         type:String,
         enum:['pending','confirmed','cancelled'],
         default:'pending'
+    },
+    options:{
+        type:Object,
     }
 })
 

@@ -5,7 +5,6 @@ module.exports.getFullDetails = async (hotelData) => {
         return new Promise((resolve, reject) => {
             const promises = []
             const hotelPromises = hotelData?.hotelImage.map((img, idx) => {
-                console.log("img", img)
                 return getFromS3(img).then((resultUrl) => {
                     hotelData.hotelImage[idx] = resultUrl
                 })

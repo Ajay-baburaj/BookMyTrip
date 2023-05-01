@@ -47,7 +47,7 @@ function BookingForm() {
     }, [guest])
 
     useEffect(()=>{
-        
+        console.log(data)
     },[data])
 
     const handleOpen = () => {
@@ -120,19 +120,26 @@ function BookingForm() {
             currency: "INR",
             name: "bookyMyTrip",
             description: "Test Transaction",
-            // image: { logo },
             order_id: data.id,
             handler: async function (response) {
-                const data = {
+                console.log(response)
+                const datas = {
                     orderCreationId: data.id,
-                    razorpayPaymentId: response.razorpay_payment_id,
-                    razorpayOrderId: response.razorpay_order_id,
-                    razorpaySignature: response.razorpay_signature,
+                    bookingId:hotel?._id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_signature: response.razorpay_signature,
                 };
 
-                // const result = await axios.post("http://localhost:5000/payment/success", data);
+                console.log("razorpayData",datas)
+                try{
+                    const result = await axios.post(verifyUrl, datas)
+                    alert(result?.data.msg);
+                }catch(err){
+                    console.log(err.message)
+                }
 
-                // alert(result.data.msg);
+
             },
             theme: {
                 color: "#61dafb",
@@ -148,7 +155,6 @@ function BookingForm() {
             try {
 
                 await axios.post(`${confirmBooking}/${hotel._id}`, { data }).then((response) => {
-                    // initPayment(hotel,response)
                     displayRazorpay(response.data)
 
                 })

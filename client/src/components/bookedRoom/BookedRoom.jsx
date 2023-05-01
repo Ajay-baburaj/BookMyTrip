@@ -4,21 +4,50 @@ import { Link } from 'react-router-dom'
 import { PersonOutline } from '@material-ui/icons';
 import BedIcon from '@material-ui/icons/Hotel';
 import MailIcon from '@material-ui/icons/Mail';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
+import { getBookingDetails, getRoomCmpltURL } from '../../utils/APIRoutes';
 
 
-function BookedRoom(props) {
-    const { details, room } = props
-    console.log(details)
+
+function BookedRoom() {
+    const details = useSelector(state => state?.booking?.details)
+    const user = useSelector(state => state.user.user)
+    const [hotel, setHotel] = useState()
+    const [bookingData,setBookingData] = useState();
+    const [room, setRoom] = useState()
     const checkInDate = new Date(details?.checkInDate).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
     const checkOutDate = new Date(details?.checkOutDate).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
     const oneDay = 24 * 60 * 60 * 1000;
     const diffDays = Math.round(Math.abs((new Date(checkInDate) - new Date(checkOutDate))) / oneDay);
-    console.log(details?.checkInDate)
+    
 
+    useEffect(() => {
+        getCmpltRoomDtls()
+        getBookingData()
+    }, [])
 
+    const getCmpltRoomDtls = async () => {
+        const fetchedDetails = await axios.get(`${getRoomCmpltURL}/${details?.hotel}`)
+        setHotel(fetchedDetails?.data)
+    }
+
+    useEffect(() => {
+        const roomdata = hotel?.rooms.find((room) => room._id == details.room)
+        setRoom(roomdata)
+    }, [hotel])
+
+  
+
+    const getBookingData = async()=>{
+        const booking = await axios.get(`${getBookingDetails}/${details._id}`)
+        setBookingData(booking?.data)
+    }
+
+    console.log(bookingData)
     return (
         <>
-            <Grid sx={{ border: "solid 1px #d4cecd", boxShadow: 10 }}>
+        <Grid sx={{ border: "solid 1px #d4cecd", boxShadow: 10 }}>
                 <Container marginBottom={5} sx={{ gap: "10px" }}>
                     <h1 className='bookingDetails'>Your booking details</h1>
                     <img src={room ? room?.images[0] : ""} alt="" className='RoomImg' />
@@ -42,16 +71,16 @@ function BookedRoom(props) {
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                             <Typography sx={{ fontSize: "14px" }}>No of the guests</Typography>
                             <PersonOutline />
-                            <Typography sx={{ fontSize: "14px" }}>3</Typography>
+                            <Typography sx={{ fontSize: "14px" }}>{bookingData&& bookingData?.guests-1}</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                             <Typography sx={{ fontSize: "14px" }}>Rooms</Typography>
                             <BedIcon />
-                            <Typography sx={{ fontSize: "14px" }}>2</Typography>
+                            <Typography sx={{ fontSize: "14px" }}>{bookingData && bookingData.numberOfRooms}</Typography>
                         </Box>
                     </Box>
                     <Box sx={{ display: 'flex', gap: '5px' }}>
-                        <Typography sx={{ fontSize: "16px", fontWeight: "500" }}>{`Price: ₹ ${room && parseInt(room?.price) * parseInt(diffDays)} `}</Typography>
+                        <Typography sx={{ fontSize: "16px", fontWeight: "500" }}>{`Price: ₹ ${bookingData && bookingData?.total} `}</Typography>
                         <Typography sx={{ color: 'text.disabled' }}>( 12% gst included)</Typography>
                     </Box>
                     <Box sx={{ width: '100%', padding: '15px', backgroundColor: '#DBDFEA', borderRadius: '5px' }}>
@@ -64,7 +93,7 @@ function BookedRoom(props) {
                             </Box>
                            
                         </Box>
-                        <Typography sx={{ fontSize: "14px", fontWeight: "bold" }}>Guets {4}</Typography>
+                        <Typography sx={{ fontSize: "14px", fontWeight: "bold" }}>Guets </Typography>
                     </Box>
                     <Link >change your selection</Link>
                 </Container>

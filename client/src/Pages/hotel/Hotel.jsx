@@ -15,7 +15,7 @@ import Header from '../../components/header/Header';
 import Navbar from '../../components/navbar/Navbar';
 import MailList from '../../components/mailList/MailList';
 import Footer from '../../components/footer/Footer';
-import { bookRoomUrl, getRoomCmpltURL } from '../../utils/APIRoutes'
+import { bookRoomUrl, getRoomCmpltURL, retainRoomUrl } from '../../utils/APIRoutes'
 import { makeStyles } from '@material-ui/core/styles';
 import { Modal, Backdrop, Fade } from '@material-ui/core';
 import { Box } from '@mui/material';
@@ -37,6 +37,7 @@ function Hotel() {
 
   const classes = useStyles();
   const hotel = useSelector(state => state)
+  const booking = useSelector(state => state?.booking?.details)
   const [slideNumber, setSlideNumber] = useState(0)
   const [open, setOpen] = useState(false)
   const [details, setDetails] = useState({})
@@ -49,12 +50,23 @@ function Hotel() {
     setOpen(!open)
   }
 
+  useEffect(()=>{
+    handleRetainRoom()
+  },[])
+
+  const handleRetainRoom = async()=>{
+    await axios.get(`${retainRoomUrl}/${id}`).then((res)=>{
+      console.log(res)
+    })
+  }
+
   useEffect(() => {
     getCmpltRoomDtls()
   }, [])
 
   const handleBooking = async (roomId) => {
-      const { date, destination, options } = hotel?.search
+    const { date, destination, options } = hotel?.search
+    console.log(date)
     const bookingData = {
       userId: hotel?.user?.user?._id,
       roomId,
@@ -63,13 +75,24 @@ function Hotel() {
       destination,
       options
     }
-    await axios.post(bookRoomUrl, { ...bookingData }).then((response) => {
-      dispatch({
-        type: "BOOK_ROOM",
-        payload: {...response?.data}
+
+    const checkInDate = date[0]?.startDate.substring(0, 10)
+    const checkOutDate = date[0]?.endDate.substring(0, 10)
+    const bookingInDate = booking?.checkInDate.substring(0, 10)
+    const bookingOutDate = booking?.checkOutDate.substring(0, 10)
+
+    if (roomId == booking.room && id == booking.hotel && JSON.stringify(options) == JSON.stringify(booking.options) && (checkInDate == bookingInDate && checkOutDate == bookingOutDate)) {
+      navigate(`/booking/${booking?._id}`)
+    } else {
+      await axios.post(bookRoomUrl, { ...bookingData }).then((response) => {
+        dispatch({
+          type: "BOOK_ROOM",
+          payload: { ...response?.data }
+        })
+
+        navigate(`/booking/${response?.data?._id}`)
       })
-      navigate(`/booking/${response?.data?._id}`)
-    })
+    }
   }
 
   const getCmpltRoomDtls = async () => {

@@ -8,8 +8,9 @@ const { default: mongoose } = require('mongoose')
 const { getFromS3 } = require('../helper/s3Bucket')
 const { getWholeImagesOfHotel } = require('../helper/loginChecker')
 const bookingModel = require('../model/bookingModel')
-const Razorpay = require('razorpay');
-const {instance, generateRazorpay, verifyPayment} = require('../helper/razorpay')
+const Razorpay = require('razorpay')
+const moment = require('moment')
+const { instance, generateRazorpay, verifyPayment } = require('../helper/razorpay')
 
 
 
@@ -58,9 +59,9 @@ module.exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
         console.log(req.body)
-        const userCheck = await users.findOne({ email})
+        const userCheck = await users.findOne({ email })
         console.log(userCheck)
-        if(userCheck.status){
+        if (userCheck.status) {
             console.log(userCheck)
             if (!userCheck) {
                 return res.json({ inValidMail: true, msg: "invalid email", status: false })
@@ -81,10 +82,10 @@ module.exports.login = async (req, res, next) => {
                     userCheck, accesToken
                 })
             }
-        }else{
-            res.json({inValidMail:true,status:false,msg:"Account is blocked"})
+        } else {
+            res.json({ inValidMail: true, status: false, msg: "Account is blocked" })
         }
-       
+
 
     } catch (err) {
         console.log(err.message)
@@ -190,30 +191,30 @@ module.exports.otpSignIn = async (req, res, next) => {
 module.exports.getHotels = async (req, res, next) => {
     const { min, max, ...others } = req.query;
     console.log(others)
-  
+
     try {
         if (min != 0 && max != 0) {
             const hotels = await hotelModel.aggregate([
                 {
-                  $match: {
-                    status: true,
-                    isRegistered: true,
-                    isBlocked:false,
-                    ...others,
-                  },
+                    $match: {
+                        status: true,
+                        isRegistered: true,
+                        isBlocked: false,
+                        ...others,
+                    },
                 },
                 {
-                  $match: {
-                    rooms: {
-                      $elemMatch: {
-                        price: { $gte: parseInt(min), $lte: parseInt(min) },
-                      },
+                    $match: {
+                        rooms: {
+                            $elemMatch: {
+                                price: { $gte: parseInt(min), $lte: parseInt(min) },
+                            },
+                        },
                     },
-                  },
                 },
-              ]);
+            ]);
             res.status(200).json(hotels)
-            } else {
+        } else {
             const hotels = await hotelModel.find({
                 status: true,
                 isRegistered: true,
@@ -264,89 +265,168 @@ module.exports.getSingleHotelData = async (req, res, next) => {
     }
 }
 
-module.exports.countByCity = async(req,res,next)=>{
+module.exports.countByCity = async (req, res, next) => {
     const cities = req.query.cities.split(",");
-    try{
+    try {
         const list = await Promise.all(
-            cities.map((city)=>{
-                return hotelModel.countDocuments({city:city,isRegistered:true,status:true,isBlocked:false});
+            cities.map((city) => {
+                return hotelModel.countDocuments({ city: city, isRegistered: true, status: true, isBlocked: false });
             })
         )
         res.status(200).json(list)
-    }catch(err){
+    } catch (err) {
         console.log(err)
     }
 }
 
-module.exports.countByType = async(req,res,next)=>{
-    try{
-        const hotelCount = await hotelModel.countDocuments({type:"hotel"})
-        const apartmentCount = await hotelModel.countDocuments({type:"hotel"})
-        const resortCount = await hotelModel.countDocuments({type:"hotel"})
-        const villaCount = await hotelModel.countDocuments({type:"hotel"})
-        
+module.exports.countByType = async (req, res, next) => {
+    try {
+        const hotelCount = await hotelModel.countDocuments({ type: "hotel" })
+        const apartmentCount = await hotelModel.countDocuments({ type: "hotel" })
+        const resortCount = await hotelModel.countDocuments({ type: "hotel" })
+        const villaCount = await hotelModel.countDocuments({ type: "hotel" })
+
         res.status(200).json([
-            {type:"hotel",count:hotelCount},
-            {type:"apartment",count:apartmentCount},
-            {type:"resort",count:resortCount},
-            {type:"villa",count:villaCount}
+            { type: "hotel", count: hotelCount },
+            { type: "apartment", count: apartmentCount },
+            { type: "resort", count: resortCount },
+            { type: "villa", count: villaCount }
         ])
 
-    }catch(err){
+    } catch (err) {
         console.log(err)
     }
 }
 
-module.exports.bookRoom = async(req,res,next)=>{
-    try{
-
-        const {userId,roomId,hotelId,date,destination,options} = req.body
+module.exports.bookRoom = async (req, res, next) => {
+    try {
+        console.log(req.body)
+        const { userId, roomId, hotelId, date, destination, options } = req.body
         const checkInDate = new Date(date[0]?.startDate)
         const checkOutDate = new Date(date[0]?.endDate)
         const oneDay = 24 * 60 * 60 * 1000;
-        const dateOptions = {weekday:'short',day:'numeric',month:'short',year:'numeric'}
-        const formattedCheckIn= checkInDate.toLocaleDateString('en-Us',dateOptions)
-        const formattedCheckOut= checkInDate.toLocaleDateString('en-Us',dateOptions)
-        const diffDays = Math.round(Math.abs(checkInDate- checkOutDate) / oneDay)
-        const hotel = await hotelModel.findById({_id:hotelId})
+        const dateOptions = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }
+        const formattedCheckIn = checkInDate.toLocaleDateString('en-Us', dateOptions)
+        const formattedCheckOut = checkInDate.toLocaleDateString('en-Us', dateOptions)
+        const diffDays = Math.round(Math.abs(checkInDate - checkOutDate) / oneDay)
+        const hotel = await hotelModel.findById({ _id: hotelId })
         const roomdata = hotel?.rooms.find((room) => room._id == roomId)
-        const total = parseInt(diffDays)*parseInt(roomdata.price)
-    
-        console.log(total)
+        const total = parseInt(options?.room) * parseInt(diffDays) * parseInt(roomdata.price)
+        const tax = total * 0.12
+        const grandTotal = total + tax
+
         const bookingData = await bookingModel.create({
-          user:userId,
-          room:roomId,
-          hotel:hotelId,
-          checkInDate,
-          checkOutDate,
-          days:diffDays,
-          total,
-          guests:options?.adult+options?.children, 
+            user: userId,
+            room: roomId,
+            hotel: hotelId,
+            numberOfRooms: options?.room,
+            checkInDate,
+            checkOutDate,
+            days: diffDays,
+            total: grandTotal,
+            guests: options?.adult + options?.children,
+            options,
         })
         res.status(200).json(bookingData)
-    }catch(err){
+    } catch (err) {
         console.log(err.message)
     }
-  }
+}
 
 
 
-  module.exports.confirmBooking = async(req,res,next)=>{
-    try{
+module.exports.confirmBooking = async (req, res, next) => {
+    try {
         const bookingId = req.params.id
-        const details = await bookingModel.findById({_id:bookingId})
-        const result = await generateRazorpay(bookingId,details?.total)
+        const details = await bookingModel.findById({ _id: bookingId })
+        const result = await generateRazorpay(bookingId, details?.total)
         console.log(result)
-        res.status(200).json(result)                                                                                 
-    }catch(err){
+        res.status(200).json(result)
+    } catch (err) {
         console.log(err)
     }
-  }
+}
 
-  module.exports.verifyPayment =(req,res)=>{
-    console.log("call is coming inside verifypayment")
-    const payment = verifyPayment(req.body)
-  }
+module.exports.getBooking = async (req, res, next) => {
+    try {
+        const bookingId = req.params.id
+        console.log(req.params.id)
+        const booking = await bookingModel.findById({ _id: bookingId })
+        console.log(booking)
+        res.status(200).json(booking)
+    } catch (err) {
+        console.log(err.message)
+    }
+}
+
+module.exports.verifyPayment = async (req, res) => {
+    try {
+        console.log(req.body);
+        await verifyPayment(req.body).then(async (response) => {
+            if (response.status) {
+                const bookingId = req.body?.bookingId;
+                console.log(bookingId);
+                const booking = await bookingModel.findByIdAndUpdate(
+                    bookingId,
+                    { status: "active" },
+                    { new: true }
+                );
+                const checKInDate = moment(booking?.checkInDate);
+                const checKOutDate = moment(booking?.checkOutDate);
+                const duration = moment.duration(checKOutDate.diff(checKInDate)).asDays();
+                const singleDigit = Math.round(duration);
+                const roomsToSubtract = booking?.numberOfRooms;
+
+                const hotel = await hotelModel
+                    .findByIdAndUpdate(
+                        booking?.hotel,
+                        {
+                            $inc: {
+                                ["rooms.$[room].numberOfRooms"]: -roomsToSubtract,
+                            },
+                        },
+                        {
+                            arrayFilters: [
+                                {
+                                    "room._id": booking?.room,
+                                },
+                            ],
+                            new: true,
+                        }
+                    )
+                    .exec();
+
+                console.log(`Updated hotel: ${hotel}`);
+            }
+        });
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
+
+module.exports.retainHotelRoom = async (req, res, next) => {
+    try {
+        const roomToRetain = await bookingModel.find({ hotel: new mongoose.Types.ObjectId(req.params.id) });
+        const edited = roomToRetain.filter(async(room, index) => {
+            const chekDate = new Date(room.checkOutDate);
+            const currentDate = new Date();
+            const dateString = chekDate.toISOString().substring(0, 10);
+            const currentDateStr = currentDate.toISOString().substring(0, 10);
+            if (new Date(dateString) > new Date(currentDateStr)) {
+                return room.room;
+            }
+        });
+
+        console.log('edited', edited);
+        res.status(200).send(edited);
+    } catch (error) {
+        res.status(500).send(error);
+    }
+};
+
+
+
+
 
 
 

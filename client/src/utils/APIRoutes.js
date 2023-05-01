@@ -11,4 +11,6 @@ export const getHotelImagesURL = `${host}/get/images`
 export const getRoomCmpltURL = `${host}/get/details`
 export const bookRoomUrl = `${host}/book/room` 
 export const confirmBooking = `${host}/confirm/booking`
-export const verifyUrl = `${host}/verify/razorpay`
+export const getBookingDetails = `${host}/get/booking`
+export const verifyUrl = `${host}/payment/success`
+export const retainRoomUrl = `${host}/room/count`
