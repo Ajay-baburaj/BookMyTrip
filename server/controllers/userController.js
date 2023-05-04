@@ -11,6 +11,7 @@ const bookingModel = require('../model/bookingModel')
 const Razorpay = require('razorpay')
 const moment = require('moment')
 const { instance, generateRazorpay, verifyPayment } = require('../helper/razorpay')
+const { getFormattedDate } = require('../helper/dateFormat')
 
 
 
@@ -397,6 +398,7 @@ module.exports.verifyPayment = async (req, res) => {
                     .exec();
 
                 console.log(`Updated hotel: ${hotel}`);
+                res.status(200).json(hotel)
             }
         });
     } catch (error) {
@@ -407,7 +409,7 @@ module.exports.verifyPayment = async (req, res) => {
 module.exports.retainHotelRoom = async (req, res, next) => {
     try {
         const roomToRetain = await bookingModel.find({ hotel: new mongoose.Types.ObjectId(req.params.id) });
-        const edited = roomToRetain.filter(async(room, index) => {
+        const edited = roomToRetain.filter(async (room, index) => {
             const chekDate = new Date(room.checkOutDate);
             const currentDate = new Date();
             const dateString = chekDate.toISOString().substring(0, 10);
@@ -423,6 +425,100 @@ module.exports.retainHotelRoom = async (req, res, next) => {
         res.status(500).send(error);
     }
 };
+
+module.exports.getUserWiseBooking = async (req, res, next) => {
+    try {
+        const userId = req.params.id
+        const bookings = await bookingModel.find({ user: userId, status: { $ne: 'pending' } });
+
+        const bookingDetails = await Promise.all(bookings.map(async (booking) => {
+            const checkInDate = await getFormattedDate(booking.checkInDate)
+            const checkOutDate = await getFormattedDate(booking.checkOutDate)
+            const hotelData = await hotelModel.findById(booking.hotel)
+            const completeHotel = await getWholeImagesOfHotel(hotelData)
+            const roomdata = completeHotel.rooms.find((room) => {
+                return JSON.stringify(room._id) === JSON.stringify(booking.room);
+            })
+
+
+            if (new Date(checkOutDate) < new Date()) {
+                booking.status = 'completed'
+                await booking.save()
+            }
+
+            return {
+                ...booking.toJSON(),
+                checkInDate,
+                checkOutDate,
+                hoteldetails: completeHotel,
+                roomDetails: roomdata
+            }
+        }))
+
+        res.status(200).json(bookingDetails)
+    } catch (err) {
+        console.log(err.message)
+    }
+}
+
+module.exports.cancelBooking = async(req,res,next)=>{
+    try{
+
+        const bookingId = req.params.id
+        const check = await bookingModel.findById(bookingId) 
+        const current = new Date()
+        const checkIn = moment(check.checkInDate)
+        const currentDate = moment(current)
+        const duration = moment.duration(currentDate.diff(checkIn)).asDays();
+        const singleDigit = Math.round(duration);
+
+        if(parseInt(singleDigit) > 0){
+            const booking = await bookingModel.findByIdAndUpdate(bookingId,{status:'cancelled'})
+            const countIncrease = booking?.numberOfRooms
+            const roomId = booking?.room
+            const hotelId = booking?.hotel
+    
+            await hotelModel.updateOne(
+                { _id: hotelId, "rooms._id": roomId },
+                { $inc: { "rooms.$.numberOfRooms": countIncrease } }
+              )          
+             .then((response)=>{
+                res.status(200).json({status:true,msg:'cancelled successfully'})
+            })
+        }else{
+            res.status(200).json({status:false,msg:'you can only cancel room before check-in date'})
+        }
+       
+    }catch(err){
+        console.log(err.message)
+    }
+}
+
+
+
+module.exports.updateBookedBy = async(req,res,next)=>{
+    try{
+        const bookingId = req.params.id
+        const name = req.body?.data?.firstName +" "+req.body?.data?.lastName
+        const bookedBy = {
+            name,
+            email:req.body.data.email,
+            phone:req.body.data.phone
+        }
+        const updateModel = await bookingModel.findByIdAndUpdate(bookingId,{bookedBy})
+        res.status(200).json(updateModel)
+    }catch(err){
+        console.log(err.message)
+    }
+}
+
+
+
+
+
+
+
+
 
 
 

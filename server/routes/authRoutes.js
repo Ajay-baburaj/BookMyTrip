@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const {register,bookRoom, login, forgotPassword,resetPassword, validateMobile,otpSignIn,getHotels,getHotelImages,getSingleHotelData, countByCity, confirmBooking, verifyPayment, getBooking, retainHotelRoom} = require("../controllers/userController")
+const {register,bookRoom, login, forgotPassword,resetPassword, validateMobile,otpSignIn,getHotels,getHotelImages,getSingleHotelData, countByCity, confirmBooking, verifyPayment, getBooking, retainHotelRoom, getUserWiseBooking, cancelBooking, updateBookedBy} = require("../controllers/userController")
 
 router.post("/register",register)
 router.post("/login",login)
@@ -16,5 +16,8 @@ router.post('/confirm/booking/:id',confirmBooking)
 router.get('/get/booking/:id',getBooking)
 router.post ('/payment/success',verifyPayment)
 router.get('/room/count/:id',retainHotelRoom)
+router.get('/user/booking/:id',getUserWiseBooking)
+router.post('/cancel/booking/:id',cancelBooking)
+router.put('/add/bookedby/:id',updateBookedBy)
 
 module.exports = router;

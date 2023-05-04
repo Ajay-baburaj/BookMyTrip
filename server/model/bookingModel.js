@@ -37,14 +37,14 @@ const bookingSchema = new mongoose.Schema({
         type:Array
     },
     bookedBy:{
-        type:String
+        type:Object
     },
     totalPrice:{
         type:Number,
     },
     status:{
         type:String,
-        enum:['pending','confirmed','cancelled'],
+        enum:['pending','confirmed','cancelled','completed'],
         default:'pending'
     },
     options:{

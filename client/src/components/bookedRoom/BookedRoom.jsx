@@ -83,18 +83,24 @@ function BookedRoom() {
                         <Typography sx={{ fontSize: "16px", fontWeight: "500" }}>{`Price: ₹ ${bookingData && bookingData?.total} `}</Typography>
                         <Typography sx={{ color: 'text.disabled' }}>( 12% gst included)</Typography>
                     </Box>
-                    <Box sx={{ width: '100%', padding: '15px', backgroundColor: '#DBDFEA', borderRadius: '5px' }}>
+
+                    {
+                        bookingData?.bookedBy ? (<>
+                         <Box sx={{ width: '100%', padding: '15px', backgroundColor: '#DBDFEA', borderRadius: '5px' }}>
                         <Typography sx={{ fontSize: "14px", fontWeight: "bold" }}>Booked by:</Typography>
                         <Box sx={{ display: 'flex', gap: '15px' }}>
-                            <Typography sx={{ fontSize: "14px", fontWeight: "bold" }}>Ajay Baburaj</Typography>
+                            <Typography sx={{ fontSize: "14px", fontWeight: "bold" }}>{bookingData?.bookedBy.name}</Typography>
                             <Box sx={{display:'flex',gap:'10px'}}>
                                 <MailIcon />
-                                <Typography sx={{ fontSize: "14px" }}>ajaybaburajp@gmail.com</Typography>
+                                <Typography sx={{ fontSize: "14px" }}>{bookingData?.bookedBy.email}</Typography>
                             </Box>
                            
                         </Box>
-                        <Typography sx={{ fontSize: "14px", fontWeight: "bold" }}>Guets </Typography>
+                        {/* <Typography sx={{ fontSize: "14px", fontWeight: "bold" }}>Guets </Typography> */}
                     </Box>
+                        </>) : ''
+                    }
+                   
                     <Link >change your selection</Link>
                 </Container>
 

@@ -4,17 +4,22 @@ import {
     Select, FormControl, InputLabel, Grid, Button, Modal
 } from '@mui/material'
 import axios from 'axios'
-
 import { useSelector } from 'react-redux'
-import { confirmBooking, verifyUrl } from '../utils/APIRoutes'
+import{Toaster,toast} from 'react-hot-toast'
+import { confirmBooking, verifyUrl, updateBookedByUrl } from '../utils/APIRoutes'
+import { useNavigate } from 'react-router-dom'
 
 function BookingForm() {
     const user = useSelector(state => state?.user?.user)
     const hotel = useSelector(state => state?.booking?.details)
+    const navigate = useNavigate()
     const [open, setOpen] = React.useState(false);
     const [add, setAdd] = useState(false)
     const [selectedValue, setSelectedValue] = useState('myself')
     const [guest, setGuest] = useState([])
+    const [check, setCheck] = useState(false);
+    const [bookedBy, setBookedBy] = useState({})
+    const [addBookedBy, setAddBookedBy] = useState(false);
     const [title, setTitle] = useState('Mr')
     const [data, setData] = useState({ firstName: '', lastName: '', email: '', phone: '' })
     const [errors, setErrors] = useState({ emailErr: '', phoneErr: '', firstNameErr: '', lastNameErr: '' })
@@ -25,9 +30,9 @@ function BookingForm() {
     }
 
     useEffect(() => {
-        if(selectedValue == 'myself'){
-            setData({firstName:user?.username,lastName:'',email:user?.email,phone:user?.phone})
-        }else{
+        if (selectedValue == 'myself') {
+            setData({ firstName: user?.username, lastName: '', email: user?.email, phone: user?.phone })
+        } else {
             setData({ firstName: '', lastName: '', email: '', phone: '' })
         }
         console.log('selectedValue changed: ', selectedValue)
@@ -46,9 +51,9 @@ function BookingForm() {
         console.log(guest)
     }, [guest])
 
-    useEffect(()=>{
+    useEffect(() => {
         console.log(data)
-    },[data])
+    }, [data])
 
     const handleOpen = () => {
         setOpen(true)
@@ -59,31 +64,31 @@ function BookingForm() {
         setAdd(false)
     }
     const handleError = () => {
-        let errors={}
+        let errors = {}
         const { firstName, lastName, email, phone } = data;
         if (firstName == '') {
-            setErrors({...errors,firstNameErr:"Enter First Name"})
+            setErrors({ ...errors, firstNameErr: "Enter First Name" })
             return false
         } else if (firstName.length < 3) {
-            setErrors({...errors,firstNameErr :"FIrst Name should be more than 3 characters"})
+            setErrors({ ...errors, firstNameErr: "FIrst Name should be more than 3 characters" })
             return false
         } else if (lastName == '') {
-            setErrors({...errors,lastNameErr :'Enter Last Name'})
+            setErrors({ ...errors, lastNameErr: 'Enter Last Name' })
             return false
         } else if (lastName.length < 3) {
-            setErrors({...errors,lastNameErr :"Last Name should be more than 3 characters"})
+            setErrors({ ...errors, lastNameErr: "Last Name should be more than 3 characters" })
             return false
         } else if (email == '') {
-            setErrors({...errors,emailErr : 'email required'})
+            setErrors({ ...errors, emailErr: 'email required' })
             return false
         } else if (phone == '') {
-            setErrors({...errors,phoneErr :'phone number required'})
+            setErrors({ ...errors, phoneErr: 'phone number required' })
             return false
         } else if (phone.length > 10 || phone.length > 10) {
-            setErrors({...errors,phoneErr : 'Invalid Phone number'})
+            setErrors({ ...errors, phoneErr: 'Invalid Phone number' })
             return false;
         }
-    
+
         return true;
     }
 
@@ -125,17 +130,23 @@ function BookingForm() {
                 console.log(response)
                 const datas = {
                     orderCreationId: data.id,
-                    bookingId:hotel?._id,
+                    bookingId: hotel?._id,
                     razorpay_payment_id: response.razorpay_payment_id,
                     razorpay_order_id: response.razorpay_order_id,
                     razorpay_signature: response.razorpay_signature,
                 };
 
-                console.log("razorpayData",datas)
-                try{
-                    const result = await axios.post(verifyUrl, datas)
-                    alert(result?.data.msg);
-                }catch(err){
+                try {
+                    await axios.post(verifyUrl, datas).then((res)=>{
+                        console.log("response",res)
+                        toast.success('Booking successfull')
+                        setTimeout(() => {
+                            navigate('/profile')
+                        }, 3000)
+
+                    })
+                    // alert(result?.data.msg);
+                } catch (err) {
                     console.log(err.message)
                 }
 
@@ -150,26 +161,36 @@ function BookingForm() {
         paymentObject.open();
     }
 
-    const handleBooking = async () => {
+
+    const handleForm = async () => {
         if (handleError()) {
-            try {
-
-                await axios.post(`${confirmBooking}/${hotel._id}`, { data }).then((response) => {
-                    displayRazorpay(response.data)
-
-                })
-            } catch (err) {
-                console.log(err)
-            }
-        }else{
-            console.log(errors)
+          const editedData = await axios.put(`${updateBookedByUrl}/${hotel._id}`, { data });
+          return true; 
+        } else {
+          return false; 
         }
-    }
+      }
+      
+      const handleBooking = async () => {
+        const isFormValid = await handleForm() 
+        if (isFormValid) { 
+          try {
+            await axios.post(`${confirmBooking}/${hotel._id}`, { data }).then((response) => {
+              displayRazorpay(response.data);
+            });
+          } catch (err) {
+            console.log(err);
+          }
+        } else {
+          console.log('something went wrong')
+        }
+      }
+      
 
 
-    useEffect(()=>{
+    useEffect(() => {
         console.log(errors)
-    },[errors])
+    }, [errors])
 
     const style = {
         position: 'absolute',
@@ -185,7 +206,7 @@ function BookingForm() {
 
 
     return (
-        <Box sx={{ padding: "1.5rem", boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.25)' }}>
+        <Box sx={{ padding: "1.5rem", boxShadow: '0px 2px 6px rgba(0, 0, 0, 0.25)', marginTop: { lg: '2rem' } }}>
             <Typography sx={{ marginTop: '2rem' }} variant='h8'>Please fill to contine with booking</Typography>
             <Grid container spacing={2} marginLeft={0.5} marginTop={0.75}>
                 <Box sx={{ display: add ? 'none' : 'flex', alignItems: 'center', marginTop: 1, marginBottom: 1 }} >
@@ -242,7 +263,7 @@ function BookingForm() {
                             error={errors.firstNameErr ? true : false}
                             onChange={(e) => handleChange(e)}
                             onFocus={() => setErrors({ ...errors, ["firstNameErr"]: "" })}
-                            value={ data && data?.firstName}
+                            value={data && data?.firstName}
                         />
                     </Grid>
                     <Grid item xs={4} lg={5} sm={4}>
@@ -254,7 +275,7 @@ function BookingForm() {
                             error={errors.lastNameErr ? true : false}
                             onChange={(e) => handleChange(e)}
                             onFocus={() => setErrors({ ...errors, ["lastNameErr"]: "" })}
-                            value={ data && data?.lastName}
+                            value={data && data?.lastName}
                         />
                     </Grid>
                 </Box>
@@ -269,7 +290,7 @@ function BookingForm() {
                         error={errors.emailErr ? true : false}
                         onChange={(e) => handleChange(e)}
                         onFocus={() => setErrors({ ...errors, ["emailErr"]: "" })}
-                        value={ data && data?.email}
+                        value={data && data?.email}
                     />
                 </Grid>
                 <Grid item xs={4} lg={5} sm={5}>
@@ -281,7 +302,7 @@ function BookingForm() {
                         error={errors.phoneErr ? true : false}
                         onChange={(e) => handleChange(e)}
                         onFocus={() => setErrors({ ...errors, ["phoneErr"]: "" })}
-                        value={ data && data?.phone}
+                        value={data && data?.phone}
                     />
                 </Grid>
             </Box>
@@ -300,6 +321,8 @@ function BookingForm() {
 
                 </Box>
             </Modal>
+            <Toaster position="top-center" reverseOrder={false}
+            />
         </Box>
     )
 }

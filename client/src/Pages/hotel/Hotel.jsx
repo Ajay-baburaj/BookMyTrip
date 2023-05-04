@@ -37,6 +37,7 @@ function Hotel() {
 
   const classes = useStyles();
   const hotel = useSelector(state => state)
+  const user = useSelector(state => state?.user?.user)
   const booking = useSelector(state => state?.booking?.details)
   const [slideNumber, setSlideNumber] = useState(0)
   const [open, setOpen] = useState(false)
@@ -50,12 +51,12 @@ function Hotel() {
     setOpen(!open)
   }
 
-  useEffect(()=>{
+  useEffect(() => {
     handleRetainRoom()
-  },[])
+  }, [])
 
-  const handleRetainRoom = async()=>{
-    await axios.get(`${retainRoomUrl}/${id}`).then((res)=>{
+  const handleRetainRoom = async () => {
+    await axios.get(`${retainRoomUrl}/${id}`).then((res) => {
       console.log(res)
     })
   }
@@ -65,34 +66,40 @@ function Hotel() {
   }, [])
 
   const handleBooking = async (roomId) => {
-    const { date, destination, options } = hotel?.search
-    console.log(date)
-    const bookingData = {
-      userId: hotel?.user?.user?._id,
-      roomId,
-      hotelId: id,
-      date,
-      destination,
-      options
-    }
+    if (user) {
+      const { date, destination, options } = hotel?.search
+      console.log(date)
+      const bookingData = {
+        userId: hotel?.user?.user?._id,
+        roomId,
+        hotelId: id,
+        date,
+        destination,
+        options
+      }
 
-    const checkInDate = date[0]?.startDate.substring(0, 10)
-    const checkOutDate = date[0]?.endDate.substring(0, 10)
-    const bookingInDate = booking?.checkInDate.substring(0, 10)
-    const bookingOutDate = booking?.checkOutDate.substring(0, 10)
+      const checkInDate = date[0]?.startDate.substring(0, 10)
+      const checkOutDate = date[0]?.endDate.substring(0, 10)
+      const bookingInDate = booking?.checkInDate.substring(0, 10)
+      const bookingOutDate = booking?.checkOutDate.substring(0, 10)
 
-    if (roomId == booking.room && id == booking.hotel && JSON.stringify(options) == JSON.stringify(booking.options) && (checkInDate == bookingInDate && checkOutDate == bookingOutDate)) {
-      navigate(`/booking/${booking?._id}`)
-    } else {
-      await axios.post(bookRoomUrl, { ...bookingData }).then((response) => {
-        dispatch({
-          type: "BOOK_ROOM",
-          payload: { ...response?.data }
+      if (roomId == booking.room && id == booking.hotel && JSON.stringify(options) == JSON.stringify(booking.options) && (checkInDate == bookingInDate && checkOutDate == bookingOutDate)) {
+        navigate(`/booking/${booking?._id}`)
+      } else {
+        await axios.post(bookRoomUrl, { ...bookingData }).then((response) => {
+          dispatch({
+            type: "BOOK_ROOM",
+            payload: { ...response?.data }
+          })
+
+          navigate(`/booking/${response?.data?._id}`)
         })
-
-        navigate(`/booking/${response?.data?._id}`)
-      })
+      }
+    }else{
+      alert('call is coming here')
+      navigate('/login')
     }
+
   }
 
   const getCmpltRoomDtls = async () => {
@@ -117,6 +124,10 @@ function Hotel() {
     }
     setSlideNumber(newSlideNumber)
   }
+
+  const handleAddBookedBy = async()=>{
+    
+  } 
 
   return (
     <div>

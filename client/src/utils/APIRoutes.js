@@ -14,3 +14,6 @@ export const confirmBooking = `${host}/confirm/booking`
 export const getBookingDetails = `${host}/get/booking`
 export const verifyUrl = `${host}/payment/success`
 export const retainRoomUrl = `${host}/room/count`
+export const getUserWiseBookingUrl = `${host}/user/booking`
+export const bookingCancelUrl = `${host}/cancel/booking`
+export const updateBookedByUrl = `${host}/add/bookedby`

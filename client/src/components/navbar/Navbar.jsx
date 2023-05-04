@@ -26,7 +26,7 @@ function Navbar() {
       <div className="navContainer">
         <span className="logo">BookMytrip</span>
         {user?.username && user?.username ? (
-          <div className="userDisplay">
+          <div className="userDisplay" onClick={()=>navigate('/profile')}>
             <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png?w=740&t=st=1679303737~exp=1679304337~hmac=9a0d99da350810dd8e2f71f5127f56af325bc8f2e2e1ba980fd58fff858c483ec" alt="user Image" className="userProPic" />
             <span className='user'>{user.username}</span>
             <span style={{ marginLeft: "10px", cursor: "pointer" }} onClick={handleLogout}>logout</span>

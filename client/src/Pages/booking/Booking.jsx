@@ -3,11 +3,10 @@ import { Box, Button, Container, Grid, Typography, Modal } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import { Navbar } from 'react-bootstrap'
 import Header from '../../components/header/Header';
-import { Link } from 'react-router-dom'
 import MailList from '../../components/mailList/MailList';
 import Footer from '../../components/footer/Footer';
 import BookedRoom from '../../components/bookedRoom/BookedRoom';
-import SearchItem from '../../components/searchItem/SearchItem';
+import ShowHotel from '../../components/ShowHotel'
 import { useSelector } from "react-redux";
 import BookingForm from "../../components/BookingForm";
 import { getRoomCmpltURL } from '../../utils/APIRoutes'
@@ -42,13 +41,10 @@ function Booking() {
                         <BookedRoom details={details} room={room} />
                     </Grid>
                     <Grid item xs={12} md={6} lg={6}>
-                        <SearchItem hotel={hotel} search={false} />
+                        <ShowHotel hotel={hotel} search={true} />
                         <BookingForm />
                     </Grid>
                 </Grid>
-                
-
-
             </Box>
             <MailList></MailList>
             <Footer></Footer>
