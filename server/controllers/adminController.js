@@ -8,6 +8,7 @@ const { generateToken, verify_JWT_Token } = require('../helper/jwt');
 const hotelModel = require('../model/hotelModel');
 const { getFromS3 } = require('../helper/s3Bucket');
 const {getWholeImagesOfHotel} = require('../helper/loginChecker')
+const bookingModal =require('../model/bookingModel')
 // const { resolveClientEndpointParameters } = require('@aws-sdk/client-s3/dist-types/endpoint/EndpointParameters');
 const maxAge = 3 * 24 * 60 * 60
 
@@ -249,5 +250,15 @@ module.exports.getSingleHotel = async(req,res)=>{
     }catch(err){
         res.status(401).json({msg:err.message})
         console.log(err.meassage)
+    }
+}
+
+module.exports.getAllBooking= async(req,res)=>{
+    try{
+        console.log('call is coming here')
+        const data = await bookingModal.find({status:{$ne:'pending'}})
+        res.status(200).json(data)
+    }catch(err){
+        console.log(err.message)
     }
 }
