@@ -68,7 +68,10 @@ function Profile() {
           <Box sx={{ display: 'flex', gap: '1rem' }}>
             <Phone />
             <Typography variant={"h8"}>{user?.phone}</Typography>
-
+          </Box>
+          <Box sx={{ display: 'flex', gap: '1rem' }}>
+            <Phone />
+            <Typography variant={"h8"}>{`wallet : ${user?.wallet}`}</Typography>
           </Box>
         </Box>
         <Box  sx={{marginTop:'2rem',marginBottom:'2rem'}}>

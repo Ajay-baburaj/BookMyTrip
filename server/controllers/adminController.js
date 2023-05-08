@@ -8,7 +8,8 @@ const { generateToken, verify_JWT_Token } = require('../helper/jwt');
 const hotelModel = require('../model/hotelModel');
 const { getFromS3 } = require('../helper/s3Bucket');
 const {getWholeImagesOfHotel} = require('../helper/loginChecker')
-const bookingModal =require('../model/bookingModel')
+const bookingModal =require('../model/bookingModel');
+const { getFormattedDate } = require('../helper/dateFormat');
 // const { resolveClientEndpointParameters } = require('@aws-sdk/client-s3/dist-types/endpoint/EndpointParameters');
 const maxAge = 3 * 24 * 60 * 60
 
@@ -257,7 +258,24 @@ module.exports.getAllBooking= async(req,res)=>{
     try{
         console.log('call is coming here')
         const data = await bookingModal.find({status:{$ne:'pending'}})
-        res.status(200).json(data)
+        const bookings = await Promise.all(data.map(async (booking)=>{
+            const checkInDate = await getFormattedDate(booking.checkInDate)
+            const checKOutDate = await getFormattedDate(booking.checkOutDate)
+            const hotelData = await hotelModel.findById(booking.hotel)
+            const completeHotel = await getWholeImagesOfHotel(hotelData)
+            const roomdata = completeHotel.rooms.find((room)=>{
+                return JSON.stringify(room._id) === JSON.stringify(booking.room)
+            })
+
+            return {
+                ...booking.toJSON(),
+                checkInDate,
+                checKOutDate,
+                hoteldetails:completeHotel,
+                roomDetails:roomdata
+            }
+        }))
+        res.status(200).json(bookings)
     }catch(err){
         console.log(err.message)
     }

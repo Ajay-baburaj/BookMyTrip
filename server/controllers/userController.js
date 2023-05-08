@@ -12,6 +12,7 @@ const Razorpay = require('razorpay')
 const moment = require('moment')
 const { instance, generateRazorpay, verifyPayment } = require('../helper/razorpay')
 const { getFormattedDate } = require('../helper/dateFormat')
+const { UserChannelInstance } = require('twilio/lib/rest/chat/v1/service/user/userChannel')
 
 
 
@@ -315,6 +316,17 @@ module.exports.bookRoom = async (req, res, next) => {
         const total = parseInt(options?.room) * parseInt(diffDays) * parseInt(roomdata.price)
         const tax = total * 0.12
         const grandTotal = total + tax
+        const userDetails = await users.findById(userId)
+        
+        let displayPrice = 0;
+        if(userDetails?.wallet  > grandTotal){  
+             displayPrice = userDetails.wallet - grandTotal
+        }
+        else if(userDetails?.wallet <= grandTotal){
+            displayPrice = grandTotal - userDetails?.wallet
+        }
+
+        console.log("",displayPrice)
 
         const bookingData = await bookingModel.create({
             user: userId,
@@ -324,6 +336,7 @@ module.exports.bookRoom = async (req, res, next) => {
             checkInDate,
             checkOutDate,
             days: diffDays,
+            displayPrice,
             total: grandTotal,
             guests: options?.adult + options?.children,
             options,
@@ -334,14 +347,48 @@ module.exports.bookRoom = async (req, res, next) => {
     }
 }
 
+module.exports.payUsingWallet = async(req,res,next)=>{
+    try{
+        const bookingId = req.params.id
+        const booking = await bookingModel.findById(bookingId)
+        const user = await users.findById(booking?.user)
+        let discountedPrice = 0;
+        let walletBalance = 0;
+        let displayPrice = 0;
+        if(user.wallet > booking.total){
+             discountedPrice = booking.total
+             displayPrice = discountedPrice - booking.total
+             walletBalance = user.wallet-booking.total
+        }else if(user.wallet <= booking.total && user.wallet >0){
+             discountedPrice = user.wallet
+             displayPrice = booking?.total-discountedPrice
+             walletBalance =0
+        }
+
+        await bookingModel.findByIdAndUpdate(bookingId,{
+            discountedPrice,
+            displayPrice,
+            walletBalance,
+            
+        })
+        const data = await users.findByIdAndUpdate(booking.user,{wallet:walletBalance},{new:true}).select({
+            _id:1,email:1,phone:1,status:1,wallet:1,username:1
+        })
+        res.status(200).json(data)
+    
+    }catch(err){
+        console.log(err)
+    }
+}
+
 
 
 module.exports.confirmBooking = async (req, res, next) => {
     try {
         const bookingId = req.params.id
-        const details = await bookingModel.findById({ _id: bookingId })
-        const result = await generateRazorpay(bookingId, details?.total)
-        console.log(result)
+        const details = await bookingModel.findById(bookingId)
+        const result = await generateRazorpay(bookingId,details?.displayPrice)
+        
         res.status(200).json(result)
     } catch (err) {
         console.log(err)
@@ -351,7 +398,7 @@ module.exports.confirmBooking = async (req, res, next) => {
 module.exports.getBooking = async (req, res, next) => {
     try {
         const bookingId = req.params.id
-        console.log(req.params.id)
+        console.log("req",req.params.id)
         const booking = await bookingModel.findById({ _id: bookingId })
         console.log(booking)
         res.status(200).json(booking)
@@ -362,7 +409,7 @@ module.exports.getBooking = async (req, res, next) => {
 
 module.exports.verifyPayment = async (req, res) => {
     try {
-        console.log(req.body);
+        console.log("verify",req.body);
         await verifyPayment(req.body).then(async (response) => {
             if (response.status) {
                 const bookingId = req.body?.bookingId;
@@ -477,7 +524,7 @@ module.exports.cancelBooking = async(req,res,next)=>{
             const countIncrease = booking?.numberOfRooms
             const roomId = booking?.room
             const hotelId = booking?.hotel
-    
+            await users.findByIdAndUpdate(booking?.user,{$inc:{wallet:booking?.total}})
             await hotelModel.updateOne(
                 { _id: hotelId, "rooms._id": roomId },
                 { $inc: { "rooms.$.numberOfRooms": countIncrease } }

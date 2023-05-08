@@ -176,6 +176,7 @@ function BookingForm() {
         if (isFormValid) { 
           try {
             await axios.post(`${confirmBooking}/${hotel._id}`, { data }).then((response) => {
+                console.log(response)
               displayRazorpay(response.data);
             });
           } catch (err) {

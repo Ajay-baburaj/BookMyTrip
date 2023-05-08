@@ -30,6 +30,15 @@ const bookingSchema = new mongoose.Schema({
     total:{
         type:Number,
     },
+    displayPrice:{
+        type:Number
+    },
+    discountedPrice:{
+        type:Number
+    },
+    walletBalance:{
+        type:Number
+    },
     guests:{
         type:Number,
     },

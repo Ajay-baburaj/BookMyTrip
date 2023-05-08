@@ -1,38 +1,43 @@
-import { createStore, applyMiddleware, compose } from "redux";
+import { createStore, applyMiddleware, compose, combineReducers } from "redux";
 import { composeWithDevTools } from 'redux-devtools-extension';
 import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
+import bookingReducer from "./bookingReducer";
 
 
-const initialState = {
-    user:{},
+const userInitialState = {
+    data:{},
     loggedIn:false
 }
 
-const reducer = (state=initialState,action)=>{
+const userReducer = (state=userInitialState,action)=>{
     switch(action.type){
         case "ADMIN_LOGIN":
             return{
                 ...state,
-                user:{...action.payload}
-        
+                data:{...action.payload}
             }
         case "ADMIN_LOGOUT":
             return{
                 ...state,
-                user:action.payload
+                data:action.payload
             }  
          default:    
             return state; 
     }
 }
 
+const rootReducer = combineReducers({
+    user: userReducer,
+    booking:bookingReducer
+});
+
 const persistConfig ={
     key:'root',
     storage
 };
 
-const persistedReducer = persistReducer(persistConfig,reducer)
+const persistedReducer = persistReducer(persistConfig,rootReducer)
 const middleware = []
 const enhancers =[applyMiddleware(...middleware)]
 

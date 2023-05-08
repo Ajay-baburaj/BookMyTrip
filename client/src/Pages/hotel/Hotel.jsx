@@ -68,7 +68,6 @@ function Hotel() {
   const handleBooking = async (roomId) => {
     if (user) {
       const { date, destination, options } = hotel?.search
-      console.log(date)
       const bookingData = {
         userId: hotel?.user?.user?._id,
         roomId,
@@ -80,12 +79,15 @@ function Hotel() {
 
       const checkInDate = date[0]?.startDate.substring(0, 10)
       const checkOutDate = date[0]?.endDate.substring(0, 10)
-      const bookingInDate = booking?.checkInDate.substring(0, 10)
-      const bookingOutDate = booking?.checkOutDate.substring(0, 10)
-
+      const bookingOutDate = booking?.checkOutDate?.substring(0, 10)
+      const bookingInDate = booking?.checkInDate?.substring(0, 10)
+      
+     
       if (roomId == booking.room && id == booking.hotel && JSON.stringify(options) == JSON.stringify(booking.options) && (checkInDate == bookingInDate && checkOutDate == bookingOutDate)) {
+        alert('old booking')
         navigate(`/booking/${booking?._id}`)
       } else {
+        alert("new booking")
         await axios.post(bookRoomUrl, { ...bookingData }).then((response) => {
           dispatch({
             type: "BOOK_ROOM",
@@ -125,9 +127,7 @@ function Hotel() {
     setSlideNumber(newSlideNumber)
   }
 
-  const handleAddBookedBy = async()=>{
-    
-  } 
+
 
   return (
     <div>

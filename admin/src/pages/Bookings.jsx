@@ -11,6 +11,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import axios from 'axios'
 import { getAllBookingDetails } from "../utils/ApiRoutesAdmin";
 import { useEffect } from "react";
+import {useDispatch} from 'react-redux'
 
 const locales = {
     "en-US": require("date-fns/locale/en-US"),
@@ -28,6 +29,7 @@ function Bookings() {
     const [newEvent, setNewEvent] = useState({ title: "", start: "", end: "" });
     const [allEvents, setAllEvents] = useState([]);
     const [view, setView] = useState(Views.MONTH);
+    const dispatch = useDispatch()
 
     useEffect(() => {
         getAllBookings();
@@ -36,11 +38,15 @@ function Bookings() {
     const getAllBookings = async () => {
         try {
             const { data } = await axios.get(getAllBookingDetails);
-            const mappedEvents = data.map((booking) => ({
-                title: booking.hotel,
+            dispatch({
+                type:"GET_BOOKINGS",
+                payload: data
+            })
+            const mappedEvents = data?.map((booking) => ({
+                title: `${booking.hoteldetails?.name} - ${booking._id}`,
                 start: new Date(booking.checkInDate),
                 end: new Date(booking.checkInDate),
-            }));
+              }))
             setAllEvents(mappedEvents);
         } catch (error) {
             console.error(error);
@@ -50,6 +56,12 @@ function Bookings() {
     const handleView = (view) => {
         setView(view);
     };
+
+    const handleSelectEvent = (event) => {
+        const bookingId = event.title.split('-')[1]
+        alert(bookingId)
+        console.log('Selected event:', event);
+    }
 
     return (
         <div className="App">
@@ -74,11 +86,18 @@ function Bookings() {
                                 <div>{children}</div>
                             </div>
                         ),
-                        event: ({ event }) => <div>{event.title}</div>,
+                        event: ({ event }) => (
+                            <div>
+                              <div>
+                                {event.title}
+                              </div>
+                            </div>
+                        ),
                     },
                 }}
+                onSelectEvent={handleSelectEvent}
             />
-
+            
         </div>
     );
 }

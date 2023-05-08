@@ -27,8 +27,6 @@ function Booking() {
     const getCmpltRoomDtls = async () => {
         const fetchedDetails = await axios.get(`${getRoomCmpltURL}/${details?.hotel}`)
         setHotel(fetchedDetails?.data)
-        console.log(hotel, "hooooo")
-
     }
 
     return (
