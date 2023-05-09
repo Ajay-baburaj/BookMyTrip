@@ -60,14 +60,15 @@ function AdminLogin() {
     if (handleError()) {
 
       axios.post(loginUrl, { email, password },{withCredentials:true}).then((response) => {
+
         console.log(response.data)
         if (response.data.status) {
-             dispatch({
-              type:"ADMIN_LOGIN",
-              payload:{
-                email:response.data.user
-              }
-            })
+          dispatch({
+            type:"ADMIN_LOGIN",
+            payload:{
+              email:response.data.user
+            }
+          })
           navigate("/admin")
         }else{
           if(response.data.passwordStatus== false){

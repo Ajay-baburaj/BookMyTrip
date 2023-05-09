@@ -21,10 +21,11 @@ module.exports.login = async (req, res, next) => {
     const { email, password } = req.body
     try {
         const adminCredentials = await db.collection("admin").findOne({ email })
+        
         if (adminCredentials) {
             const isValidPassword = await bcrypt.compare(password, adminCredentials.password)
             if (isValidPassword) {
-                const token = generateToken({ email: email }, jwt_secret, "15m")
+                const token = generateToken({ email: email }, jwt_secret, "15m")            
                 const refreshToken = generateToken({ email: email }, refresh_secret, "5d");
                 res.cookie("accessToken", token, { httpOnly: false, maxage: maxAge * 1000, withCredentials: true })
                 res.cookie("refreshToken", refreshToken, { httpOnly: false, maxage: maxAge * 1000, withCredentials: true })

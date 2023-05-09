@@ -300,52 +300,41 @@ module.exports.countByType = async (req, res, next) => {
     }
 }
 
-module.exports.bookRoom = async (req, res, next) => {
-    try {
-        console.log(req.body)
-        const { userId, roomId, hotelId, date, destination, options } = req.body
+module.exports.bookRoom = async(req,res,next)=>{
+    try{
+
+        const {userId,roomId,hotelId,date,destination,options} = req.body
+        
         const checkInDate = new Date(date[0]?.startDate)
         const checkOutDate = new Date(date[0]?.endDate)
         const oneDay = 24 * 60 * 60 * 1000;
-        const dateOptions = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }
-        const formattedCheckIn = checkInDate.toLocaleDateString('en-Us', dateOptions)
-        const formattedCheckOut = checkInDate.toLocaleDateString('en-Us', dateOptions)
-        const diffDays = Math.round(Math.abs(checkInDate - checkOutDate) / oneDay)
+        const dateOptions = {weekday:'short',day:'numeric',month:'short',year:'numeric'}
+        const formattedCheckIn= checkInDate.toLocaleDateString('en-Us',dateOptions)
+        const formattedCheckOut= checkInDate.toLocaleDateString('en-Us',dateOptions)
+        const diffDays = Math.round(Math.abs(checkInDate- checkOutDate) / oneDay)
         const hotel = await hotelModel.findById({ _id: hotelId })
         const roomdata = hotel?.rooms.find((room) => room._id == roomId)
         const total = parseInt(options?.room) * parseInt(diffDays) * parseInt(roomdata.price)
         const tax = total * 0.12
         const grandTotal = total + tax
-        const userDetails = await users.findById(userId)
-        
-        let displayPrice = 0;
-        if(userDetails?.wallet  > grandTotal){  
-             displayPrice = userDetails.wallet - grandTotal
-        }
-        else if(userDetails?.wallet <= grandTotal){
-            displayPrice = grandTotal - userDetails?.wallet
-        }
-
-        console.log("",displayPrice)
 
         const bookingData = await bookingModel.create({
-            user: userId,
-            room: roomId,
-            hotel: hotelId,
-            numberOfRooms: options?.room,
-            checkInDate,
-            checkOutDate,
-            days: diffDays,
-            displayPrice,
-            total: grandTotal,
-            guests: options?.adult + options?.children,
-            options,
+          user:userId,
+          room:roomId,
+          hotel:hotelId,
+          numberOfRooms:options?.room,
+          checkInDate,
+          checkOutDate,
+          days:diffDays,
+          total:grandTotal,
+          guests:options?.adult+options?.children, 
+          options
         })
         res.status(200).json(bookingData)
-    } catch (err) {
+    }catch(err){
         console.log(err.message)
     }
-}
+  }
 
 module.exports.payUsingWallet = async(req,res,next)=>{
     try{

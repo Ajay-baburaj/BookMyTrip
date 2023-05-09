@@ -68,6 +68,7 @@ function Hotel() {
   const handleBooking = async (roomId) => {
     if (user) {
       const { date, destination, options } = hotel?.search
+      console.log("date",date)
       const bookingData = {
         userId: hotel?.user?.user?._id,
         roomId,
@@ -84,11 +85,11 @@ function Hotel() {
       
      
       if (roomId == booking.room && id == booking.hotel && JSON.stringify(options) == JSON.stringify(booking.options) && (checkInDate == bookingInDate && checkOutDate == bookingOutDate)) {
-        alert('old booking')
         navigate(`/booking/${booking?._id}`)
       } else {
-        alert("new booking")
+        alert("its new booking")
         await axios.post(bookRoomUrl, { ...bookingData }).then((response) => {
+          console.log("response",response)
           dispatch({
             type: "BOOK_ROOM",
             payload: { ...response?.data }
