@@ -36,7 +36,7 @@ function Booking() {
             <Box sx={{ marginTop: '5rem', marginLeft: { xs: '2rem', md: '5rem', lg: '5rem' }, marginRight: { xs: '2rem', md: '5rem', lg: '5rem' } }}>
                 <Grid container spacing={5} alignItems="center" sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start' }}>
                     <Grid item xs={12} md={6} lg={5}>
-                        <BookedRoom details={details} room={room} />
+                        <BookedRoom details={details} room={room} profile={false}/>
                     </Grid>
                     <Grid item xs={12} md={6} lg={6}>
                         <ShowHotel hotel={hotel} search={true} />

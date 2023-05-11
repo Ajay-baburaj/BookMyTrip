@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { json, useParams } from 'react-router-dom'
 import { Box, Button, Container, Grid, Typography, Modal } from '@mui/material'
+import { Dialog, DialogTitle, DialogContent, DialogActions } from '@material-ui/core';
 import { useSelector } from 'react-redux'
-import {toast,Toaster} from 'react-hot-toast'
+import { toast, Toaster } from 'react-hot-toast'
 import BookedRoom from '../components/bookedRoom/BookedRoom'
 import ShowHotel from '../components/ShowHotel'
 import Navbar from '../components/navbar/Navbar'
@@ -11,16 +12,26 @@ import Header from '../components/header/Header'
 import PaymentCompleted from '../components/PaymentCompleted'
 import { bookingCancelUrl } from '../utils/APIRoutes'
 
-function BookingDetails() {
+function BookingDetails(callback) {
   const [details, setDetails] = useState()
   const [room, setRoom] = useState()
   const [hotel, setHotel] = useState()
+  const [cancel,setCancel] = useState(false)
   const { id } = useParams()
   const bookings = useSelector(state => state?.booked?.details)
+  const [open, setOpen] = useState(false);
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   useEffect(() => {
     getRoomDetails()
-  }, [])
+  }, [cancel])
 
 
   const getRoomDetails = () => {
@@ -33,16 +44,15 @@ function BookingDetails() {
   }
 
   const handleCancel = async (orderId) => {
-    const result = window.confirm('are you sure want to cancel booking ?')
-    if(result == true){
+    setOpen(false);
       const data = await axios.post(`${bookingCancelUrl}/${orderId}`)
-      if(data?.data?.status){
+      if (data?.data?.status) {
+        setCancel(true)
         toast.success(`${data?.data?.msg}`)
-      }else{
+      } else {
         toast.error(`${data?.data?.msg}`)
       }
     }
-  }
 
 
 
@@ -62,7 +72,7 @@ function BookingDetails() {
       <Box sx={{ marginTop: '5rem', marginLeft: { xs: '2rem', md: '5rem', lg: '5rem' }, marginRight: { xs: '2rem', md: '5rem', lg: '5rem' } }}>
         <Grid container spacing={5} alignItems="center" sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start' }}>
           <Grid item xs={12} md={6} lg={5}>
-            <BookedRoom details={details} room={room} />
+            <BookedRoom details={details} room={room} profile={true}/>
           </Grid>
           <Grid item xs={12} md={6} lg={6}>
             <ShowHotel hotel={hotel} search={true} />
@@ -74,25 +84,41 @@ function BookingDetails() {
                 details && details?.status == 'active' ? (
                   <>
                     <Typography >do you want to cancel your booking?</Typography>
-                    <Button variant='contained' color='error' onClick={() => handleCancel(details?._id)}>cancel</Button>
+                    <Button variant='contained' color='error' onClick={handleClickOpen}>cancel</Button>
+                    <Dialog open={open} onClose={handleClose}>
+                      <DialogTitle>Cancel Booking</DialogTitle>
+                      <DialogContent>
+                        <p>Are you sure you want to cancel the booking?</p>
+                      </DialogContent>
+                      <DialogActions>
+                        <Button onClick={handleClose} color="primary">
+                          No
+                        </Button>
+                        <Button onClick={() => handleCancel(details?._id)} color="secondary">
+                          Yes
+                        </Button>
+                      </DialogActions>
+                    </Dialog>
                   </>
                 ) : details?.status == 'cancelled' ? (
-                  <Typography style={{ backgroundColor: "lightblue" }} sx={{padding:'10px'}}>
-                    {`₹${details?.total} will be refunded to your account with 5 working days`}
+                  <Typography style={{ backgroundColor: "lightblue" }} sx={{ padding: '10px' }}>
+                    {`₹${details?.total} refunded to your wallet`}
                   </Typography>
-
-                ) : ""
+                  ) : ""
               }
+
+
 
             </Box>
           </Grid>
 
         </Grid>
+
         <Toaster position="top-center" reverseOrder={false} />
       </Box>
 
     </>
-  )
+) 
 }
 
 export default BookingDetails

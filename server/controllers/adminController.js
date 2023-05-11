@@ -10,6 +10,7 @@ const { getFromS3 } = require('../helper/s3Bucket');
 const {getWholeImagesOfHotel} = require('../helper/loginChecker')
 const bookingModal =require('../model/bookingModel');
 const { getFormattedDate } = require('../helper/dateFormat');
+const bookingModel = require('../model/bookingModel');
 // const { resolveClientEndpointParameters } = require('@aws-sdk/client-s3/dist-types/endpoint/EndpointParameters');
 const maxAge = 3 * 24 * 60 * 60
 
@@ -278,6 +279,38 @@ module.exports.getAllBooking= async(req,res)=>{
         }))
         res.status(200).json(bookings)
     }catch(err){
+        console.log(err.message)
+    }
+}
+
+module.exports.getAllusers = async(req,res,next)=>{
+    try{
+        const data= await User.find({}).select({
+            username:1,email:1,phone:1,status:1,wallet:1,createdAt:1
+        })
+        res.status(200).json(data)
+
+    }catch(err){
+        console.log(err.message)
+    }
+
+}
+
+module.exports.getBookingsForDashBoard = async (req, res, next) => {
+    try {
+        const data = await bookingModel.find({ status: { $nin: ["pending", "cancelled"] } })
+        const count = data.length
+        let totalSum = 0;
+        for (const booking of data) {
+            totalSum += booking.total;
+        }
+        const hotelCount = await hotel.find({
+            status: true,
+            isRegistered: true,
+            isBlocked: false
+          }).countDocuments()
+        res.status(200).json({data,count,total:totalSum,hotelCount})
+    } catch (err) {
         console.log(err.message)
     }
 }

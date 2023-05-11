@@ -3,11 +3,15 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt')
 require('dotenv').config
 const hotel = require('../model/hotelModel');
+const moment = require('moment');
 const { uploadTos3, getFromS3, deleteFromS3 } = require('../helper/s3Bucket')
 const { emailsender } = require("../helper/nodemailer")
 const { sendOtp, verifyOtp } = require("../helper/twilio")
 const { getFullDetails, getRoomDetails } = require('../helper/loginChecker')
 const { generateToken, verify_JWT_Token } = require("../helper/jwt");
+const { getFormattedDate } = require('../helper/dateFormat');
+const { getWholeImagesOfHotel } = require('../helper/loginChecker')
+const bookingModel = require('../model/bookingModel')
 const { response } = require('express');
 const maxAge = 3 * 24 * 60 * 60
 
@@ -172,7 +176,7 @@ module.exports.InfoSubmit = async (req, res, next) => {
               pincode
             }
           })
-       res.status(200).json({ status: true, msg: "submitted successfully", hotelDetails: updatedHotel })
+        res.status(200).json({ status: true, msg: "submitted successfully", hotelDetails: updatedHotel })
       } catch (err) {
         res.status(401).json({ status: false, error: err.message })
       }
@@ -193,7 +197,7 @@ module.exports.InfoSubmit = async (req, res, next) => {
                   pincode
                 }
               })
-             res.status(200).json({ status: true, msg: "submitted successfully", updatedHotel })
+            res.status(200).json({ status: true, msg: "submitted successfully", updatedHotel })
           }).catch((err) => {
             console.log(err.message)
             // res.json({ status: false, error: err.message })
@@ -243,7 +247,7 @@ module.exports.roomInfoSubmit = async (req, res, next) => {
     roomType,
     roomDesc,
     numberOfRooms: numOfRoomInt,
-    price:priceInt,
+    price: priceInt,
     amenities,
     images: [],
   };
@@ -343,7 +347,7 @@ module.exports.editRoom = async (req, res, next) => {
         }
       }
 
-    ])          
+    ])
       .then(async (response) => {
         if (response) {
           const details = response ? response[0].rooms : null;
@@ -421,36 +425,116 @@ module.exports.deletePhoto = async (req, res, next) => {
   }
 }
 
-module.exports.deleteRoomImages = async(req,res,next)=>{
+module.exports.deleteRoomImages = async (req, res, next) => {
   const index = req.query.index
-  const roomId= req.query.roomId
+  const roomId = req.query.roomId
   const hotelId = req.query.hotelId
-  console.log(index,roomId,hotelId)
-  
-    const details = await hotel.findById({_id:hotelId})
-    const room = details.rooms.find((room) => room._id == roomId);
-    console.log(room)
-    const imageName = room.images[index];
-    deleteFromS3(imageName)
-     await hotel.updateOne(
+  console.log(index, roomId, hotelId)
+
+  const details = await hotel.findById({ _id: hotelId })
+  const room = details.rooms.find((room) => room._id == roomId);
+  console.log(room)
+  const imageName = room.images[index];
+  deleteFromS3(imageName)
+  await hotel.updateOne(
+    {
+      _id: new mongoose.Types.ObjectId(hotelId),
+      'rooms': {
+        $elemMatch: {
+          '_id': new mongoose.Types.ObjectId(roomId),
+          'images': imageName
+        }
+      }
+    },
+    {
+      $pull: {
+        'rooms.$[].images': imageName
+      }
+    }).then((response) => {
+      console.log(response)
+      res.status(201).json({ status: true })
+    })
+}
+
+module.exports.getBookings = async (req, res, next) => {
+  try {
+    const hotelId = req.params.id
+    const data = await bookingModel.find({ hotel: new mongoose.Types.ObjectId(hotelId), status: { $ne: 'pending' } })
+    const bookings = await Promise.all(data.map(async (booking) => {
+      const checkInDate = await getFormattedDate(booking.checkInDate)
+      const checKOutDate = await getFormattedDate(booking.checkOutDate)
+      const hotelData = await hotel.findById(booking.hotel)
+      const completeHotel = await getWholeImagesOfHotel(hotelData)
+      const roomdata = completeHotel.rooms.find((room) => {
+        return JSON.stringify(room._id) === JSON.stringify(booking.room)
+      })
+
+      return {
+        ...booking.toJSON(),
+        checkInDate,
+        checKOutDate,
+        hoteldetails: completeHotel,
+        roomDetails: roomdata
+      }
+    }))
+    console.log(bookings)
+    res.status(200).json(bookings)
+  } catch (err) {
+    console.log(err.message)
+  }
+}
+
+module.exports.getAllBookings = async (req, res, next) => {
+  try {
+    const hotelId = req.params.id
+    const data = await bookingModel.find({ hotel: new mongoose.Types.ObjectId(hotelId), status: { $nin: ['pending', 'cancelled'] } })
+    const bookingCount = data?.length
+    let totalSum = 0;
+    for (const booking of data) {
+      totalSum += booking.total
+    }
+    const todaysBookings = await bookingModel.find({
+      hotel: new mongoose.Types.ObjectId(hotelId),
+      status: { $nin: ['pending', 'cancelled'] },
+      bookedDate: Date.now()
+    }).countDocuments()
+
+    const startDate = moment().startOf('month').toDate();
+    const endDate = moment().endOf('month').toDate();
+
+    const monthlyBookings = await bookingModel.find({
+      hotel: new mongoose.Types.ObjectId(hotelId),
+      status: { $nin: ['pending', 'cancelled'] },
+      bookedDate: { $gte: startDate, $lte: endDate }
+    }).countDocuments();
+    res.status(200).json({ monthlyBookings,todaysBookings, bookingCount, totalSum, data })
+  } catch (err) {
+    console.log(err.message)
+  }
+}
+
+module.exports.dayWiseSales = async(req,res,next)=>{
+  const hotelId = req.params.id
+  try{
+    const data = await bookingModel.aggregate([
       {
-        _id: new mongoose.Types.ObjectId(hotelId),
-        'rooms': {
-          $elemMatch: {
-            '_id':  new mongoose.Types.ObjectId(roomId),
-            'images': imageName
-          }
+        $match: {
+          hotel: new mongoose.Types.ObjectId(hotelId),
+          status: { $nin: ['pending', 'cancelled'] }
         }
       },
       {
-        $pull: {
-          'rooms.$[].images': imageName
+        $group: {
+          _id: "$bookedDate",
+          totalAmount: { $sum: "$total" }
         }
-      }).then((response)=>{
-        console.log(response)
-        res.status(201).json({status:true})
-      })
+      }
+    ]);
+
+    res.status(200).json(data)
+
+  }catch(err){
+    console.log(err.message)
+  }
 }
-
-
 

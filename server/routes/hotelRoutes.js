@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const {register,forgotPassword,login,InfoSubmit,getImages,resetPassword,signInWithOtp,verifyOtp,
-    roomInfoSubmit,getRoomDetails,deleteRoom,editRoom,submitEditRoom, deletePhoto, deleteRoomImages} = require('../controllers/hotelController');
+    roomInfoSubmit,getRoomDetails,deleteRoom,editRoom,submitEditRoom, deletePhoto, deleteRoomImages, getBookings, getAllBookings, dayWiseSales} = require('../controllers/hotelController');
 // const upload = require('../middlewares/multer')
 const multer = require("multer");
 const { verifyUser } = require('../middlewares/verifyUser');
@@ -23,6 +23,9 @@ router.post('/edit/room',verifyUser(secret),editRoom)
 router.post('/edit/submit',verifyUser(secret),upload.array("images",10),submitEditRoom)
 router.put('/delete/photo',verifyUser(secret),deletePhoto)
 router.delete('/delete/room/image/',deleteRoomImages)
+router.get('/get/booking/:id',getBookings)
+router.get('/get/all/bookings/:id',getAllBookings)
+router.get('/get/day/wise/:id',dayWiseSales)
 
 
 

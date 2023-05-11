@@ -87,7 +87,6 @@ function Hotel() {
       if (roomId == booking.room && id == booking.hotel && JSON.stringify(options) == JSON.stringify(booking.options) && (checkInDate == bookingInDate && checkOutDate == bookingOutDate)) {
         navigate(`/booking/${booking?._id}`)
       } else {
-        alert("its new booking")
         await axios.post(bookRoomUrl, { ...bookingData }).then((response) => {
           console.log("response",response)
           dispatch({
@@ -99,7 +98,6 @@ function Hotel() {
         })
       }
     }else{
-      alert('call is coming here')
       navigate('/login')
     }
 
@@ -147,7 +145,6 @@ function Hotel() {
           </div>
         }
         <div className="hotelWrapper">
-          {/* <button className="bookNow">Reserve or Book Now</button> */}
           <h1 className="hotelTitle">{details.name}</h1>
           <div className="hotelAddress">
             <FontAwesomeIcon icon={faLocationDot} />
@@ -199,8 +196,8 @@ function Hotel() {
                   <Tr>
                     <Td>
                       <div className="roomDetailsContainer">
-                        <div className="roomImgcontainer" style={{ width: "300px" }}>
                           <h5>{room.roomType}</h5>
+                        <div className="roomImgcontainer" style={{ width: "300px" }}>
                           <Carousel className='carousel'>
                             {room.images && room.images.map((img, idx) => (
                               <Carousel.Item key={idx}>

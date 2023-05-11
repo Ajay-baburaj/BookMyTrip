@@ -108,7 +108,6 @@ function BookingForm() {
 
 
     async function displayRazorpay(data) {
-        alert(data.id)
         const res = await loadScript(
             "https://checkout.razorpay.com/v1/checkout.js"
         );
@@ -176,8 +175,14 @@ function BookingForm() {
         if (isFormValid) { 
           try {
             await axios.post(`${confirmBooking}/${hotel._id}`, { data }).then((response) => {
-                console.log(response)
-              displayRazorpay(response.data);
+                if(response.data.paymentStatus){
+                    toast.success('Booking successfull')
+                        setTimeout(() => {
+                            navigate('/profile')
+                        }, 3000)
+                }else{
+                    displayRazorpay(response.data);
+                }
             });
           } catch (err) {
             console.log(err);
@@ -224,7 +229,7 @@ function BookingForm() {
                         <FormControlLabel value="someone" control={<Radio />} label="someone else" />
                     </RadioGroup>
                 </Box>
-                {add ? (<>
+                {/* {add ? (<>
                     <Box>
                         <Typography variant='h6'>Add Guest</Typography>
                         <Typography fontSize={13}
@@ -238,7 +243,7 @@ function BookingForm() {
                 </>) : ""
 
 
-                }
+                } */}
                 <Box sx={{ gap: '20px', display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
                     <FormControl>
                         <InputLabel id="prefix-label">Title</InputLabel>

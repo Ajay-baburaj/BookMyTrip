@@ -14,6 +14,7 @@ import Profile from './Pages/Profile';
 import OrderSuccessfull from './Pages/OrderSuccessfull'
 import BookingDetails from './Pages/BookingDetails';
 import { IsLogged } from './Auth/auth';
+import Search from './Pages/Search';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route element={<Register />} exact path="/register" />
         <Route element={<ResetPassword />} exact path="/reset/password/:id/:token" />
         <Route element={<OtpEnter />} exact path="/otp/enter/:mobile" />
+        <Route element ={<Search/>} exact path='/search' />
         <Route element={<IsLogged />}>
           <Route element={<Booking />} exact path="/booking/:id" />
           <Route element={<Payment />} exact path="/payment" />

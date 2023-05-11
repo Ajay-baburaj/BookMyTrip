@@ -1,9 +1,10 @@
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
-const { error } = require('console');
+
 
 
 module.exports.generateRazorpay = (orderId, total) => {
+  console.log("total",total)
   return new Promise((resolve, reject) => {
     const instance = new Razorpay({
       key_id: 'rzp_test_wBILsF6sI8t8aF',
@@ -15,7 +16,7 @@ module.exports.generateRazorpay = (orderId, total) => {
       currency: "INR",
       receipt: orderId
     }
-
+    console.log(options)
     instance.orders.create(options, (error, order) => {
       if (error) {
         console.log(error.message)

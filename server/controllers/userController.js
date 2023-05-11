@@ -300,18 +300,19 @@ module.exports.countByType = async (req, res, next) => {
     }
 }
 
-module.exports.bookRoom = async(req,res,next)=>{
-    try{
+module.exports.bookRoom = async (req, res, next) => {
+    try {
 
-        const {userId,roomId,hotelId,date,destination,options} = req.body
-        
+        const { userId, roomId, hotelId, date, destination, options } = req.body
+        console.log(req.body)
+
         const checkInDate = new Date(date[0]?.startDate)
         const checkOutDate = new Date(date[0]?.endDate)
         const oneDay = 24 * 60 * 60 * 1000;
-        const dateOptions = {weekday:'short',day:'numeric',month:'short',year:'numeric'}
-        const formattedCheckIn= checkInDate.toLocaleDateString('en-Us',dateOptions)
-        const formattedCheckOut= checkInDate.toLocaleDateString('en-Us',dateOptions)
-        const diffDays = Math.round(Math.abs(checkInDate- checkOutDate) / oneDay)
+        const dateOptions = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }
+        const formattedCheckIn = checkInDate.toLocaleDateString('en-Us', dateOptions)
+        const formattedCheckOut = checkInDate.toLocaleDateString('en-Us', dateOptions)
+        const diffDays = Math.round(Math.abs(checkInDate - checkOutDate) / oneDay)
         const hotel = await hotelModel.findById({ _id: hotelId })
         const roomdata = hotel?.rooms.find((room) => room._id == roomId)
         const total = parseInt(options?.room) * parseInt(diffDays) * parseInt(roomdata.price)
@@ -319,53 +320,53 @@ module.exports.bookRoom = async(req,res,next)=>{
         const grandTotal = total + tax
 
         const bookingData = await bookingModel.create({
-          user:userId,
-          room:roomId,
-          hotel:hotelId,
-          numberOfRooms:options?.room,
-          checkInDate,
-          checkOutDate,
-          days:diffDays,
-          total:grandTotal,
-          guests:options?.adult+options?.children, 
-          options
+            user: userId,
+            room: roomId,
+            hotel: hotelId,
+            numberOfRooms: options?.room,
+            checkInDate,
+            checkOutDate,
+            days: diffDays,
+            total: grandTotal,
+            guests: options?.adult + options?.children,
+            options
         })
         res.status(200).json(bookingData)
-    }catch(err){
+    } catch (err) {
         console.log(err.message)
     }
-  }
+}
 
-module.exports.payUsingWallet = async(req,res,next)=>{
-    try{
+module.exports.payUsingWallet = async (req, res, next) => {
+    try {
         const bookingId = req.params.id
         const booking = await bookingModel.findById(bookingId)
         const user = await users.findById(booking?.user)
         let discountedPrice = 0;
         let walletBalance = 0;
         let displayPrice = 0;
-        if(user.wallet > booking.total){
-             discountedPrice = booking.total
-             displayPrice = discountedPrice - booking.total
-             walletBalance = user.wallet-booking.total
-        }else if(user.wallet <= booking.total && user.wallet >0){
-             discountedPrice = user.wallet
-             displayPrice = booking?.total-discountedPrice
-             walletBalance =0
+        if (user.wallet > booking.total) {
+            discountedPrice = booking.total
+            displayPrice = discountedPrice - booking.total
+            walletBalance = user.wallet - booking.total
+        } else if (user.wallet <= booking.total && user.wallet > 0) {
+            discountedPrice = user.wallet
+            displayPrice = Math.round(booking?.total - discountedPrice)
+            walletBalance = 0
         }
 
-        await bookingModel.findByIdAndUpdate(bookingId,{
+        await bookingModel.findByIdAndUpdate(bookingId, {
             discountedPrice,
             displayPrice,
             walletBalance,
-            
+
         })
-        const data = await users.findByIdAndUpdate(booking.user,{wallet:walletBalance},{new:true}).select({
-            _id:1,email:1,phone:1,status:1,wallet:1,username:1
+        const data = await users.findByIdAndUpdate(booking.user, { wallet: walletBalance }, { new: true }).select({
+            _id: 1, email: 1, phone: 1, status: 1, wallet: 1, username: 1
         })
         res.status(200).json(data)
-    
-    }catch(err){
+
+    } catch (err) {
         console.log(err)
     }
 }
@@ -376,33 +377,7 @@ module.exports.confirmBooking = async (req, res, next) => {
     try {
         const bookingId = req.params.id
         const details = await bookingModel.findById(bookingId)
-        const result = await generateRazorpay(bookingId,details?.displayPrice)
-        
-        res.status(200).json(result)
-    } catch (err) {
-        console.log(err)
-    }
-}
-
-module.exports.getBooking = async (req, res, next) => {
-    try {
-        const bookingId = req.params.id
-        console.log("req",req.params.id)
-        const booking = await bookingModel.findById({ _id: bookingId })
-        console.log(booking)
-        res.status(200).json(booking)
-    } catch (err) {
-        console.log(err.message)
-    }
-}
-
-module.exports.verifyPayment = async (req, res) => {
-    try {
-        console.log("verify",req.body);
-        await verifyPayment(req.body).then(async (response) => {
-            if (response.status) {
-                const bookingId = req.body?.bookingId;
-                console.log(bookingId);
+        if (details.displayPrice == 0) {
                 const booking = await bookingModel.findByIdAndUpdate(
                     bookingId,
                     { status: "active" },
@@ -432,8 +407,63 @@ module.exports.verifyPayment = async (req, res) => {
                         }
                     )
                     .exec();
+            res.status(200).json({ paymentStatus: true })
+        } else {
+            console.log(details)
+            const result = await generateRazorpay(bookingId, details.displayPrice ? details.displayPrice :details.total)
+            res.status(200).json(result)
+        }
+    } catch (err) {
+        console.log(err)
+    }
+}
 
-                console.log(`Updated hotel: ${hotel}`);
+module.exports.getBooking = async (req, res, next) => {
+    try {
+        const bookingId = req.params.id
+        console.log("req", req.params.id)
+        const booking = await bookingModel.findById({ _id: bookingId })
+        res.status(200).json(booking)
+    } catch (err) {
+        console.log(err.message)
+    }
+}
+
+module.exports.verifyPayment = async (req, res) => {
+    try {
+        console.log("verify", req.body);
+        await verifyPayment(req.body).then(async (response) => {
+            if (response.status) {
+                const bookingId = req.body?.bookingId;
+                const booking = await bookingModel.findByIdAndUpdate(
+                    bookingId,
+                    { status: "active" },
+                    { new: true }
+                );
+                const checKInDate = moment(booking?.checkInDate);
+                const checKOutDate = moment(booking?.checkOutDate);
+                const duration = moment.duration(checKOutDate.diff(checKInDate)).asDays();
+                const singleDigit = Math.round(duration);
+                const roomsToSubtract = booking?.numberOfRooms;
+
+                const hotel = await hotelModel
+                    .findByIdAndUpdate(
+                        booking?.hotel,
+                        {
+                            $inc: {
+                                ["rooms.$[room].numberOfRooms"]: -roomsToSubtract,
+                            },
+                        },
+                        {
+                            arrayFilters: [
+                                {
+                                    "room._id": booking?.room,
+                                },
+                            ],
+                            new: true,
+                        }
+                    )
+                    .exec();
                 res.status(200).json(hotel)
             }
         });
@@ -454,8 +484,6 @@ module.exports.retainHotelRoom = async (req, res, next) => {
                 return room.room;
             }
         });
-
-        console.log('edited', edited);
         res.status(200).send(edited);
     } catch (error) {
         res.status(500).send(error);
@@ -497,52 +525,74 @@ module.exports.getUserWiseBooking = async (req, res, next) => {
     }
 }
 
-module.exports.cancelBooking = async(req,res,next)=>{
-    try{
+module.exports.cancelBooking = async (req, res, next) => {
+    try {
 
         const bookingId = req.params.id
-        const check = await bookingModel.findById(bookingId) 
+        console.log(bookingId)
+        const check = await bookingModel.findById(bookingId)
+        console.log(check.checkInDate)
         const current = new Date()
         const checkIn = moment(check.checkInDate)
         const currentDate = moment(current)
-        const duration = moment.duration(currentDate.diff(checkIn)).asDays();
+        console.log(currentDate)
+        console.log(checkIn)
+        const duration = moment.duration(checkIn.diff(currentDate)).asDays();
         const singleDigit = Math.round(duration);
+        console.log("singleDigit",singleDigit)
 
-        if(parseInt(singleDigit) > 0){
-            const booking = await bookingModel.findByIdAndUpdate(bookingId,{status:'cancelled'})
+        if (Math.abs(singleDigit) > 0) {
+            const booking = await bookingModel.findByIdAndUpdate(bookingId, { status: 'cancelled' })
             const countIncrease = booking?.numberOfRooms
             const roomId = booking?.room
             const hotelId = booking?.hotel
-            await users.findByIdAndUpdate(booking?.user,{$inc:{wallet:booking?.total}})
+            await users.findByIdAndUpdate(booking?.user, { $inc: { wallet: booking?.total } })
             await hotelModel.updateOne(
                 { _id: hotelId, "rooms._id": roomId },
                 { $inc: { "rooms.$.numberOfRooms": countIncrease } }
-              )          
-             .then((response)=>{
-                res.status(200).json({status:true,msg:'cancelled successfully'})
-            })
-        }else{
-            res.status(200).json({status:false,msg:'you can only cancel room before check-in date'})
+            )
+                .then((response) => {
+                    res.status(200).json({ status: true, msg: 'cancelled successfully' })
+                })
+        } else {
+            res.status(200).json({ status: false, msg: 'you can only cancel room before check-in date' })
         }
-       
-    }catch(err){
+
+    } catch (err) {
         console.log(err.message)
     }
 }
 
 
 
-module.exports.updateBookedBy = async(req,res,next)=>{
-    try{
+module.exports.updateBookedBy = async (req, res, next) => {
+    try {
         const bookingId = req.params.id
-        const name = req.body?.data?.firstName +" "+req.body?.data?.lastName
+        const name = req.body?.data?.firstName + " " + req.body?.data?.lastName
         const bookedBy = {
             name,
-            email:req.body.data.email,
-            phone:req.body.data.phone
+            email: req.body.data.email,
+            phone: req.body.data.phone
         }
-        const updateModel = await bookingModel.findByIdAndUpdate(bookingId,{bookedBy})
+        const updateModel = await bookingModel.findByIdAndUpdate(bookingId, { bookedBy })
         res.status(200).json(updateModel)
+    } catch (err) {
+        console.log(err.message)
+    }
+}
+
+module.exports.searchCities = async(req,res,next)=>{
+    try{
+     let regexPattern = new RegExp("^" + req.query.city, "i");
+     const data = await hotelModel.find({city:{$regex:regexPattern}})
+
+     const citiesSet = new Set();
+     data.forEach((hotel) => {
+       citiesSet.add(hotel.city);
+     });
+ 
+     const city = Array.from(citiesSet);
+     res.status(200).json(city)
     }catch(err){
         console.log(err.message)
     }

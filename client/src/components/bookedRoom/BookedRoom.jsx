@@ -10,13 +10,14 @@ import { getBookingDetails, getRoomCmpltURL, payUsingWalletUrl } from '../../uti
 
 
 
-function BookedRoom() {
+function BookedRoom({ profile }) {
     const details = useSelector(state => state?.booking?.details)
     const user = useSelector(state => state.user.user)
     const dispatch = useDispatch()
     const [hotel, setHotel] = useState()
     const { id } = useParams()
     const [bookingData, setBookingData] = useState();
+    const [payUsingWallet, setPayUsingWallet] = useState(false)
     const [room, setRoom] = useState()
     const checkInDate = new Date(details?.checkInDate).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
     const checkOutDate = new Date(details?.checkOutDate).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
@@ -27,7 +28,11 @@ function BookedRoom() {
     useEffect(() => {
         getCmpltRoomDtls()
         getBookingData()
-    }, [])
+    }, [payUsingWallet])
+
+    useEffect(() => {
+
+    }, [bookingData])
 
     const getCmpltRoomDtls = async () => {
         const fetchedDetails = await axios.get(`${getRoomCmpltURL}/${details?.hotel}`)
@@ -48,11 +53,11 @@ function BookedRoom() {
 
     const handleWallet = async () => {
         const { data } = await axios.put(`${payUsingWalletUrl}/${bookingData?._id}`, {})
-        alert(data?.wallet)
         dispatch({
             type: "UPDATE_USER",
             payload: data
         })
+        setPayUsingWallet(!payUsingWallet)
     }
 
     console.log(bookingData)
@@ -95,24 +100,28 @@ function BookedRoom() {
                             <Typography sx={{ fontSize: "16px", fontWeight: "500" }}>{`Price: ₹ ${bookingData && bookingData?.total} `}</Typography>
                             <Typography sx={{ color: 'text.disabled' }}>( 12% gst included)</Typography>
                         </Box>
-
-                        <Box sx={{marginLeft:0, display: 'flex', marginTop: '1rem',gap:'20px' }}>
-                            {user?.wallet > 0 && (
-                                <>
-                                    <Button onClick={handleWallet}>Pay using wallet</Button>
-                                    <Button variant="outlined">{`₹ ${user.wallet}`}</Button>
-                                </>
-                            )}
-                        </Box>
-
+                        {
+                            profile ? "" : (<Box sx={{ marginLeft: 0, display: 'flex', marginTop: '1rem', gap: '20px' }}>
+                                {user?.wallet > 0 && (
+                                    <>
+                                        <Button onClick={handleWallet}>Pay using wallet</Button>
+                                        <Button variant="outlined">{`₹ ${user.wallet}`}</Button>
+                                    </>
+                                )}
+                            </Box>)
+                        }
                         {bookingData?.discountedPrice > 0 && (
                             <Box>
                                 <Typography sx={{ fontSize: '16px', fontWeight: '500', color: 'green' }}>
                                     {`Amount paid from wallet: ₹ ${bookingData.discountedPrice}`}
                                 </Typography>
-                                <Typography sx={{ fontSize: '16px', fontWeight: '500' }}>
-                                    {`Net amount payable: ₹ ${bookingData.displayPrice}`}
-                                </Typography>
+                                {
+                                    profile ? (<Typography sx={{ fontSize: '16px', fontWeight: '500' }}>
+                                        {`Net amount paid: ₹ ${bookingData.displayPrice}`}
+                                    </Typography>) : (<Typography sx={{ fontSize: '16px', fontWeight: '500' }}>
+                                        {`Net amount payable: ₹ ${bookingData.displayPrice}`}
+                                    </Typography>)
+                                }
                             </Box>
                         )}
 
@@ -135,8 +144,10 @@ function BookedRoom() {
                             </Box>
                         </>) : ''
                     }
-
-                    <Link >change your selection</Link>
+                    {
+                        profile ? "" :  <Link >change your selection</Link>
+                    }
+                   
                 </Container>
 
             </Grid>

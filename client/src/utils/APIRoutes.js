@@ -18,3 +18,4 @@ export const getUserWiseBookingUrl = `${host}/user/booking`
 export const bookingCancelUrl = `${host}/cancel/booking`
 export const updateBookedByUrl = `${host}/add/bookedby`
 export const payUsingWalletUrl = `${host}/pay/using/wallet`
+export const searchCities = `${host}/search/cities`

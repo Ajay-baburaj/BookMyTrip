@@ -32,7 +32,7 @@ const Sidebar = ({ props }) => {
             icon: <FaUserAlt />
         },
         {
-            path: "/hotel/booking",
+            path: "/hotel/bookings",
             name: "Bookings",
             icon: <FaRegChartBar />
         },

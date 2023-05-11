@@ -58,6 +58,10 @@ const bookingSchema = new mongoose.Schema({
     },
     options:{
         type:Object,
+    },
+    bookedDate:{
+        type:Date,
+        default:Date.now()
     }
 })
 
