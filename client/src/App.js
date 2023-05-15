@@ -27,7 +27,7 @@ function App() {
         <Route element={<Register />} exact path="/register" />
         <Route element={<ResetPassword />} exact path="/reset/password/:id/:token" />
         <Route element={<OtpEnter />} exact path="/otp/enter/:mobile" />
-        <Route element ={<Search/>} exact path='/search' />
+        <Route element={<Search />} exact path='/search' />
         <Route element={<IsLogged />}>
           <Route element={<Booking />} exact path="/booking/:id" />
           <Route element={<Payment />} exact path="/payment" />

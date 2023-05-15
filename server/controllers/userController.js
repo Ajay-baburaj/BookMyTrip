@@ -599,6 +599,19 @@ module.exports.searchCities = async(req,res,next)=>{
 }
 
 
+module.exports.reviewHotel = async(req,res,next)=>{
+    console.log(req.body.id)
+    const bookingId = req.params.booking
+    const userId = req.params.user
+    const booking = bookingModel.findById(bookingId)
+    if(userId == booking.user && booking.status == 'completed'){
+        //eligible for review
+        
+    }else{
+        res.status(400).json({message:'you cannot add review with out booking'})
+    }
+}
+
 
 
 
