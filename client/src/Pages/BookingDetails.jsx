@@ -10,7 +10,9 @@ import ShowHotel from '../components/ShowHotel'
 import Navbar from '../components/navbar/Navbar'
 import Header from '../components/header/Header'
 import PaymentCompleted from '../components/PaymentCompleted'
-import { bookingCancelUrl } from '../utils/APIRoutes'
+import { bookingCancelUrl, getUserWiseBookingUrl } from '../utils/APIRoutes'
+import { useCookies } from 'react-cookie';
+
 
 function BookingDetails(callback) {
   const [details, setDetails] = useState()
@@ -18,7 +20,9 @@ function BookingDetails(callback) {
   const [hotel, setHotel] = useState()
   const [cancel,setCancel] = useState(false)
   const { id } = useParams()
+  const [cookies, setCookie] = useCookies(['accessToken', 'refreshToken']);
   const bookings = useSelector(state => state?.booked?.details)
+  const user = useSelector(state=>state?.user?.user)
   const [open, setOpen] = useState(false);
 
   const handleClickOpen = () => {
@@ -34,8 +38,14 @@ function BookingDetails(callback) {
   }, [cancel])
 
 
-  const getRoomDetails = () => {
-    const singleBookingDetails = bookings.find((booking) => {
+  const getRoomDetails = async() => {
+    const {data} = await axios.get(`${getUserWiseBookingUrl}/${user._id}`,{
+      headers: {
+        withCredentials: true,
+        'Authorization': `Bearer ${cookies?.accessToken}`
+      }
+    })
+    const singleBookingDetails = data.find((booking) => {
       return JSON.stringify(booking._id) === JSON.stringify(id);
     });
     setHotel(singleBookingDetails?.hoteldetails)
@@ -44,8 +54,14 @@ function BookingDetails(callback) {
   }
 
   const handleCancel = async (orderId) => {
+    alert(cookies?.accessToken)
     setOpen(false);
-      const data = await axios.post(`${bookingCancelUrl}/${orderId}`)
+      const data = await axios.post(`${bookingCancelUrl}/${orderId}`,{},{
+        headers: {
+          withCredentials: true,
+          'Authorization': `Bearer ${cookies?.accessToken}`
+        }
+      })
       if (data?.data?.status) {
         setCancel(true)
         toast.success(`${data?.data?.msg}`)
@@ -77,7 +93,7 @@ function BookingDetails(callback) {
           <Grid item xs={12} md={6} lg={6}>
             <ShowHotel hotel={hotel} search={true} />
             {
-              details && details?.status != 'cancelled' ? <PaymentCompleted hotel={hotel} order={details?._id} /> : ''
+              details && details?.status != 'cancelled' ? <PaymentCompleted hotel={hotel} order={details?.orderId} /> : ''
             }
             <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: "center", alignItems: 'center', marginTop: { lg: '4rem' } }}>
               {

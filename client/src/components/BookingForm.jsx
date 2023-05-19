@@ -6,15 +6,19 @@ import {
 import axios from 'axios'
 import { useSelector } from 'react-redux'
 import{Toaster,toast} from 'react-hot-toast'
-import { confirmBooking, verifyUrl, updateBookedByUrl } from '../utils/APIRoutes'
+import { confirmBooking, verifyUrl, updateBookedByUrl, addGuestUrl } from '../utils/APIRoutes'
 import { useNavigate } from 'react-router-dom'
+import { useCookies } from 'react-cookie';
 
-function BookingForm() {
+
+function BookingForm({callback}) {
     const user = useSelector(state => state?.user?.user)
     const hotel = useSelector(state => state?.booking?.details)
     const navigate = useNavigate()
+    const [cookies, setCookie] = useCookies(['accessToken', 'refreshToken']);
     const [open, setOpen] = React.useState(false);
     const [add, setAdd] = useState(false)
+
     const [selectedValue, setSelectedValue] = useState('myself')
     const [guest, setGuest] = useState([])
     const [check, setCheck] = useState(false);
@@ -23,7 +27,7 @@ function BookingForm() {
     const [title, setTitle] = useState('Mr')
     const [data, setData] = useState({ firstName: '', lastName: '', email: '', phone: '' })
     const [errors, setErrors] = useState({ emailErr: '', phoneErr: '', firstNameErr: '', lastNameErr: '' })
-
+    const [guestName,setGuestName] = useState({GfirstName:'',GlastName:''})
 
     const handleChange = (e) => {
         setData({ ...data, [e.target.name]: e.target.value })
@@ -38,15 +42,26 @@ function BookingForm() {
         console.log('selectedValue changed: ', selectedValue)
     }, [selectedValue])
 
-    const hanldeAdd = (firstName, lastName) => {
-        const guestName = title + " " + firstName + ' ' + lastName
-        if (guest.includes(guestName)) {
-            alert("guest alreadyu exits")
-        } else {
-            setGuest([...guest, guestName]);
-
+    const handleGuest = async() => {
+        const guestFullName = title + " " + guestName?.GfirstName + ' ' + guestName?.GlastName
+        const {data} = await axios.post(`${addGuestUrl}/${hotel._id}`,{guestName},{
+            headers: {
+              withCredentials: true,
+              'Authorization': `Bearer ${cookies?.accessToken}`
+            }
+          })
+        if(data.status == false){
+            toast.error(data.errMessage)
+        }else{
+            callback()
+            toast.success('guest added')
         }
-    }
+         }
+
+       const guestChange = (e)=>{
+        setGuestName({...guestName,[e.target.name]:e.target.value})
+       } 
+    
     useEffect(() => {
         console.log(guest)
     }, [guest])
@@ -119,7 +134,7 @@ function BookingForm() {
 
 
         const options = {
-            key: "rzp_test_wBILsF6sI8t8aF", // Enter the Key ID generated from the Dashboard
+            key: "rzp_test_wBILsF6sI8t8aF", 
             amount: hotel?.total,
             currency: "INR",
             name: "bookyMyTrip",
@@ -136,15 +151,18 @@ function BookingForm() {
                 };
 
                 try {
-                    await axios.post(verifyUrl, datas).then((res)=>{
-                        console.log("response",res)
+                    await axios.post(verifyUrl, datas,{
+                        headers: {
+                          withCredentials: true,
+                          'Authorization': `Bearer ${cookies?.accessToken}`
+                        }
+                      }).then((res)=>{
                         toast.success('Booking successfull')
                         setTimeout(() => {
-                            navigate('/profile')
+                            navigate(`/booking/details/${hotel._id}`)
                         }, 3000)
 
                     })
-                    // alert(result?.data.msg);
                 } catch (err) {
                     console.log(err.message)
                 }
@@ -163,7 +181,12 @@ function BookingForm() {
 
     const handleForm = async () => {
         if (handleError()) {
-          const editedData = await axios.put(`${updateBookedByUrl}/${hotel._id}`, { data });
+          const editedData = await axios.put(`${updateBookedByUrl}/${hotel._id}`, { data },{
+            headers: {
+              withCredentials: true,
+              'Authorization': `Bearer ${cookies?.accessToken}`
+            }
+          });
           return true; 
         } else {
           return false; 
@@ -174,11 +197,16 @@ function BookingForm() {
         const isFormValid = await handleForm() 
         if (isFormValid) { 
           try {
-            await axios.post(`${confirmBooking}/${hotel._id}`, { data }).then((response) => {
+            await axios.post(`${confirmBooking}/${hotel._id}`, { data },{
+                headers: {
+                  withCredentials: true,
+                  'Authorization': `Bearer ${cookies?.accessToken}`
+                }
+              }).then((response) => {
                 if(response.data.paymentStatus){
                     toast.success('Booking successfull')
                         setTimeout(() => {
-                            navigate('/profile')
+                            navigate(`/booking/details/${hotel._id}`)
                         }, 3000)
                 }else{
                     displayRazorpay(response.data);
@@ -229,21 +257,7 @@ function BookingForm() {
                         <FormControlLabel value="someone" control={<Radio />} label="someone else" />
                     </RadioGroup>
                 </Box>
-                {/* {add ? (<>
-                    <Box>
-                        <Typography variant='h6'>Add Guest</Typography>
-                        <Typography fontSize={13}
-                            lineHeight={1.2}
-                            color="textSecondary" variant="body1"
-                            sx={{ marginTop: '0.5rem', marginBottom: '1rem' }}
-                            disabled >
-                            Name should be as per official govt. ID & travelers below 18 years of age
-                            cannot travel alone</Typography>
-                    </Box>
-                </>) : ""
-
-
-                } */}
+ 
                 <Box sx={{ gap: '20px', display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
                     <FormControl>
                         <InputLabel id="prefix-label">Title</InputLabel>
@@ -324,7 +338,58 @@ function BookingForm() {
                 aria-describedby="modal-modal-description"
             >
                 <Box sx={{ ...style }}>
-
+                <Box>
+                        <Typography variant='h6'>Add Guest</Typography>
+                        <Typography fontSize={13}
+                            lineHeight={1.2}
+                            color="textSecondary" variant="body1"
+                            sx={{ marginTop: '0.5rem', marginBottom: '1rem' }}
+                            disabled >
+                            Name should be as per official govt. ID & travelers below 18 years of age
+                            cannot travel alone</Typography>
+                    </Box>
+                    <Box sx={{ gap: '20px', display: 'flex', alignItems: 'center', marginBottom: '1rem' }}>
+                    <FormControl>
+                        <InputLabel id="prefix-label">Title</InputLabel>
+                        <Select
+                            labelId="Title-label"
+                            id="Titles"
+                            value={title}
+                            onChange={(event) => setTitle(event.target.value)}
+                            label="Title"
+                            sx={{ height: ' 40px', width: '80px' }}
+                        >
+                            <MenuItem value="Mr">Mr</MenuItem>
+                            <MenuItem value="Mrs">Mrs</MenuItem>
+                            <MenuItem value="Ms">Ms</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <Grid item xs={4} lg={5} sm={4}>
+                        <TextField formLabel=""
+                            label="First Name"
+                            name="GfirstName"
+                            type="text"
+                            helperText={errors.firstNameErr ? errors.firstNameErr : ''}
+                            error={errors.firstNameErr ? true : false}
+                            onChange={(e) => guestChange(e)}
+                            // onFocus={() => setErrors({ ...errors, ["firstNameErr"]: "" })}
+                            // value={data && data?.firstName}
+                        />
+                    </Grid>
+                    <Grid item xs={4} lg={5} sm={4}>
+                        <TextField formLabel=""
+                            label="Last Name"
+                            name="GlastName"
+                            type="text"
+                            helperText={errors.lastNameErr ? errors.lastNameErr : ''}
+                            error={errors.lastNameErr ? true : false}
+                            onChange={(e) => guestChange(e)}
+                            // onFocus={() => setErrors({ ...errors, ["lastNameErr"]: "" })}
+                            // value={data && data?.lastName}
+                        />
+                    </Grid>
+                </Box>
+                <Button variant='outlined' onClick={handleGuest}>Add</Button>
                 </Box>
             </Modal>
             <Toaster position="top-center" reverseOrder={false}

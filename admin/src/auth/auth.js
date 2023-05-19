@@ -3,7 +3,7 @@ import {useSelector} from 'react-redux'
 function IsLogged() {
   const user = useSelector(state=>state?.user?.data?.email)
   return (
-    user ? <Outlet /> : <Navigate to="/admin/login" />
+    user != null ? <Outlet /> : <Navigate to="/admin/login" />
   );
 }
 

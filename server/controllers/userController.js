@@ -13,6 +13,9 @@ const moment = require('moment')
 const { instance, generateRazorpay, verifyPayment } = require('../helper/razorpay')
 const { getFormattedDate } = require('../helper/dateFormat')
 const { UserChannelInstance } = require('twilio/lib/rest/chat/v1/service/user/userChannel')
+const userModel = require('../model/userModel')
+const { generateUniqueRandomNumber } = require('../helper/idGenerator')
+const { generateToken } = require('../helper/jwt')
 
 
 
@@ -48,23 +51,14 @@ module.exports.register = async (req, res, next) => {
     }
 }
 
-const generateAccesToken = (user) => {
-    return jwt.sign({ id: user.id, uername: user.username }, "yoitsSecret", {
-        expiresIn: "10m"
-    })
-}
 
-const generateRefreshToken = (user) => {
-    return jwt.sign({ id: user.id, username: user.username }, "yoItsRefreshToken", { expiresIn: "10m" })
-}
+
+
 module.exports.login = async (req, res, next) => {
     try {
         const { email, password } = req.body;
-        console.log(req.body)
         const userCheck = await users.findOne({ email })
-        console.log(userCheck)
         if (userCheck.status) {
-            console.log(userCheck)
             if (!userCheck) {
                 return res.json({ inValidMail: true, msg: "invalid email", status: false })
             }
@@ -75,25 +69,24 @@ module.exports.login = async (req, res, next) => {
             }
             if (isPasswordValid && userCheck) {
                 delete userCheck.password
-                const accesToken = generateAccesToken(userCheck)
-                const refreshToken = generateRefreshToken(userCheck)
-                refreshTokens.push(refreshToken)
+                const accesToken = generateToken(userCheck?.email, process.env.USER_SECRER_KEY, '1d')
+                const refreshToken = generateToken(userCheck?.email, process.env.USER_REFRESH_TOKEN_KEY, '3d')
+
+                res.cookie('accessToken', accesToken)
+                res.cookie('refreshToken', refreshToken)
                 return res.json({
                     msg: "loggin succesfull",
                     status: true,
-                    userCheck, accesToken
+                    userCheck
                 })
             }
         } else {
             res.json({ inValidMail: true, status: false, msg: "Account is blocked" })
         }
-
-
     } catch (err) {
         console.log(err.message)
         next(err)
     }
-
 }
 
 let refreshTokens = []
@@ -318,6 +311,8 @@ module.exports.bookRoom = async (req, res, next) => {
         const total = parseInt(options?.room) * parseInt(diffDays) * parseInt(roomdata.price)
         const tax = total * 0.12
         const grandTotal = total + tax
+        const orderId = generateUniqueRandomNumber()
+        console.log("orderId", orderId)
 
         const bookingData = await bookingModel.create({
             user: userId,
@@ -328,8 +323,10 @@ module.exports.bookRoom = async (req, res, next) => {
             checkOutDate,
             days: diffDays,
             total: grandTotal,
+            roomPrice: roomdata.price,
             guests: options?.adult + options?.children,
-            options
+            options,
+            orderId
         })
         res.status(200).json(bookingData)
     } catch (err) {
@@ -378,39 +375,39 @@ module.exports.confirmBooking = async (req, res, next) => {
         const bookingId = req.params.id
         const details = await bookingModel.findById(bookingId)
         if (details.displayPrice == 0) {
-                const booking = await bookingModel.findByIdAndUpdate(
-                    bookingId,
-                    { status: "active" },
-                    { new: true }
-                );
-                const checKInDate = moment(booking?.checkInDate);
-                const checKOutDate = moment(booking?.checkOutDate);
-                const duration = moment.duration(checKOutDate.diff(checKInDate)).asDays();
-                const singleDigit = Math.round(duration);
-                const roomsToSubtract = booking?.numberOfRooms;
+            const booking = await bookingModel.findByIdAndUpdate(
+                bookingId,
+                { status: "active" },
+                { new: true }
+            );
+            const checKInDate = moment(booking?.checkInDate);
+            const checKOutDate = moment(booking?.checkOutDate);
+            const duration = moment.duration(checKOutDate.diff(checKInDate)).asDays();
+            const singleDigit = Math.round(duration);
+            const roomsToSubtract = booking?.numberOfRooms;
 
-                const hotel = await hotelModel
-                    .findByIdAndUpdate(
-                        booking?.hotel,
-                        {
-                            $inc: {
-                                ["rooms.$[room].numberOfRooms"]: -roomsToSubtract,
-                            },
+            const hotel = await hotelModel
+                .findByIdAndUpdate(
+                    booking?.hotel,
+                    {
+                        $inc: {
+                            ["rooms.$[room].numberOfRooms"]: -roomsToSubtract,
                         },
-                        {
-                            arrayFilters: [
-                                {
-                                    "room._id": booking?.room,
-                                },
-                            ],
-                            new: true,
-                        }
-                    )
-                    .exec();
+                    },
+                    {
+                        arrayFilters: [
+                            {
+                                "room._id": booking?.room,
+                            },
+                        ],
+                        new: true,
+                    }
+                )
+                .exec();
             res.status(200).json({ paymentStatus: true })
         } else {
             console.log(details)
-            const result = await generateRazorpay(bookingId, details.displayPrice ? details.displayPrice :details.total)
+            const result = await generateRazorpay(bookingId, details.displayPrice ? details.displayPrice : details.total)
             res.status(200).json(result)
         }
     } catch (err) {
@@ -431,7 +428,6 @@ module.exports.getBooking = async (req, res, next) => {
 
 module.exports.verifyPayment = async (req, res) => {
     try {
-        console.log("verify", req.body);
         await verifyPayment(req.body).then(async (response) => {
             if (response.status) {
                 const bookingId = req.body?.bookingId;
@@ -527,7 +523,7 @@ module.exports.getUserWiseBooking = async (req, res, next) => {
 
 module.exports.cancelBooking = async (req, res, next) => {
     try {
-
+        console.log("call is coming inside cancel")
         const bookingId = req.params.id
         console.log(bookingId)
         const check = await bookingModel.findById(bookingId)
@@ -539,7 +535,7 @@ module.exports.cancelBooking = async (req, res, next) => {
         console.log(checkIn)
         const duration = moment.duration(checkIn.diff(currentDate)).asDays();
         const singleDigit = Math.round(duration);
-        console.log("singleDigit",singleDigit)
+        console.log("singleDigit", singleDigit)
 
         if (Math.abs(singleDigit) > 0) {
             const booking = await bookingModel.findByIdAndUpdate(bookingId, { status: 'cancelled' })
@@ -581,36 +577,208 @@ module.exports.updateBookedBy = async (req, res, next) => {
     }
 }
 
-module.exports.searchCities = async(req,res,next)=>{
-    try{
-     let regexPattern = new RegExp("^" + req.query.city, "i");
-     const data = await hotelModel.find({city:{$regex:regexPattern}})
+module.exports.searchCities = async (req, res, next) => {
+    try {
+        console.log(req.query.city);
+        if (!req.query.city) {
+            res.status(200).json([])
+        }
 
-     const citiesSet = new Set();
-     data.forEach((hotel) => {
-       citiesSet.add(hotel.city);
-     });
- 
-     const city = Array.from(citiesSet);
-     res.status(200).json(city)
+        let regexPattern = new RegExp("^" + req.query.city, "i");
+        const data = await hotelModel.find({ city: { $regex: regexPattern } })
+
+        if (data.length == 0) {
+            res.status(200).json(['not found'])
+        } else {
+            const citiesSet = new Set();
+            data.forEach((hotel) => {
+                citiesSet.add(hotel.city);
+            });
+
+            const city = Array.from(citiesSet);
+            console.log(city)
+            res.status(200).json(city)
+        }
+
+
+    } catch (err) {
+        console.log("heyy", err.message)
+    }
+}
+
+
+module.exports.setReviewNotification = async (req, res, next) => {
+    console.log('cal is coming here')
+    console.log(req.body.id)
+    const bookingId = req.params.booking
+    const userId = req.params.user
+    const booking = bookingModel.findById(bookingId)
+    if (userId == booking.user && booking.status == 'completed') {
+        //eligible for review
+        const notificationId = Math.random * 100000
+        const booking = bookingId
+        const message = 'you can tell us how was your stay'
+        const notificationObj = {
+            notificationId,
+            booking,
+            message,
+            status: true
+        }
+        const setNotification = await userModel.findByIdAndUpdate(userId, {
+            $push: { notification: notificationObj }
+        }, { new: true }).exec();
+        res.status(200).json(setNotification)
+    } else {
+        res.status(400).json({ message: 'you cannot add review with out booking' })
+    }
+}
+
+module.exports.validateUserForReview = async (req, res, next) => {
+    try{
+        const { user, hotel } = req.body
+        const currentDate = moment(Date.now())
+        const bookings = await bookingModel.find({ user, hotel, status: 'completed' }).sort({ checkOutDate: -1 })
+        const booking = bookings[0]
+
+        const checkOutDate = moment(booking?.checkOutDate)
+        const duration = moment.duration(currentDate.diff(checkOutDate))
+        const differenceInDays = Math.round(duration.asDays())
+        console.log(differenceInDays)
+        if (differenceInDays <= 7 && differenceInDays > 0) {
+            res.status(200).json({ status: true, msg: 'you can enter the review' })
+        } else {
+            res.status(200).json({ status: false, msg: 'you havent visited the hotel recently' })
+        }
     }catch(err){
+        console.log(err.message)
+    }
+
+}
+
+module.exports.writeReview = async (req, res, next) => {
+    try {
+        const { username, userId, hotel, review } = req.body
+        const review_id = generateUniqueRandomNumber()
+        const reviewObj = {
+            review_id,
+            username,
+            userId,
+            hotel,
+            userReview: review.review,
+            rating: review.rating
+        }
+        const hotelData = await hotelModel.findByIdAndUpdate(req.body.hotel, {
+            $push: { reviews: reviewObj }
+        }, { new: true })
+        let total = 0;
+        const total_review = hotelData.reviews.forEach((review) => {
+            let ratingPoint = 0;
+            switch (review.rating) {
+                case 'excellent':
+                    ratingPoint = 3;
+                    break;
+                case 'good':
+                    ratingPoint = 2;
+                    break;
+                case 'average':
+                    ratingPoint = 1;
+                    break;
+                case 'poor':
+                    ratingPoint = 0;
+                    break;
+                case 'worst':
+                    ratingPoint = -1;
+                    break;
+            }
+            total += ratingPoint
+        });
+
+        const reviewCount = hotelData?.reviews.length
+        const average = total / reviewCount
+
+        const updateRating = await hotelModel.findByIdAndUpdate(req.body.hotel, {
+            rating: average
+        })
+        res.status(200).json({ status: true, msg: "review added successfully" })
+    } catch (err) {
+        console.log(err.message)
+    }
+}
+
+module.exports.deleteReview = async (req, res) => {
+    try {
+        const hotelId = req.query.hotel;
+        const reviewId = req.query.reviewId;
+        console.log(hotelId, reviewId)
+
+        const deletedReview = await hotelModel.findByIdAndUpdate(hotelId, {
+            $pull: { 'reviews': { review_id: reviewId } }
+        });
+
+        res.status(200).json({ status: true, msg: "review deleted" });
+    } catch (err) {
+        console.log(err.message);
+    }
+};
+
+
+module.exports.addGuestDetails = async (req, res, next) => {
+    const { guestName } = req.body;
+    const fullName = guestName.GfirstName + " " + guestName.GlastName;
+    const bookingId = req.params.id;
+    const booking = await bookingModel.findById(bookingId);
+    const guestCheck = booking.guestDetails.includes(fullName);
+    const guestCount = booking.guestDetails.length < booking.guests - 1;
+    console.log(booking)
+    if (!guestCheck && guestCount) {
+        await bookingModel.findByIdAndUpdate(bookingId, {
+            $push: { guestDetails: fullName },
+        });
+        res.status(201).json({ status: true })
+    } else {
+        let errMessage;
+        if (guestCheck == true) {
+            errMessage = "Guest already exits"
+        } else if (guestCount == false) {
+            errMessage = "Guest count exceeded from booking"
+        } else {
+            errMessage = "Guest already exists or guest count exceeded"
+        }
+        console.log(errMessage)
+        res.json({ status: false, errMessage })
+    }
+};
+
+
+module.exports.deleteGuest = async (req, res, next) => {
+    try {
+        const bookingId = req.query.bookingId
+        const guestName = req.query.name
+        const updateBooking = await bookingModel.findByIdAndUpdate(bookingId,
+            {
+                $pull: { guestDetails: guestName }
+            })
+        res.status(201).json({ status: true })
+
+    } catch (err) {
         console.log(err.message)
     }
 }
 
 
-module.exports.reviewHotel = async(req,res,next)=>{
-    console.log(req.body.id)
-    const bookingId = req.params.booking
-    const userId = req.params.user
-    const booking = bookingModel.findById(bookingId)
-    if(userId == booking.user && booking.status == 'completed'){
-        //eligible for review
-        
-    }else{
-        res.status(400).json({message:'you cannot add review with out booking'})
+module.exports.getHotelsByRating = async (req, res, next) => {
+    try {
+        const hotelsByRating = await hotelModel.find({isRegistered:true,isBlocked:false,status:true}).sort({rating:-1}).limit(5)
+        const hotelsWithImages = await Promise.all(hotelsByRating.map(getWholeImagesOfHotel));
+        res.status(200).json(hotelsWithImages)
+    } catch (err) {
+        console.log(err.message)
     }
 }
+
+
+
+
 
 
 

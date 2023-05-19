@@ -19,11 +19,14 @@ import { getUserWiseBookingUrl } from '../utils/APIRoutes'
 import { Avatar, Button, CircularProgress, IconButton, InputAdornment, SpeedDial, SpeedDialAction, SpeedDialIcon, TextField, Tooltip } from '@mui/material'
 import { CameraAlt, Close, Delete, Done, Edit } from '@mui/icons-material';
 import axios from 'axios'
+import { useCookies } from 'react-cookie';
+
 import User from '../components/User';
 
 function Profile() {
 
   const [value, setValue] = React.useState('1');
+  const [cookies, setCookie] = useCookies(['accessToken', 'refreshToken']);
   const user = useSelector(state => state?.user?.user)
   const[profilePic,setProfilePic] = useState("https://img.freepik.com/free-vector/isolated-young-handsome-man-different-poses-white-background-illustration_632498-850.jpg?w=740&t=st=1682795701~exp=1682796301~hmac=c211147536693a7dd724ed38bdcf54a1501e7f9668081df8e00c52595460a9d5")
   const [profileLoading, setProfileLoading] = useState(false)
@@ -38,15 +41,18 @@ function Profile() {
     setValue(newValue);
   };
   const getBookingDetails = async () => {
-    const data = await axios.get(`${getUserWiseBookingUrl}/${user._id}`)
+    const data = await axios.get(`${getUserWiseBookingUrl}/${user._id}`,{
+      headers: {
+        withCredentials: true,
+        'Authorization': `Bearer ${cookies?.accessToken}`
+      }
+    })
     setBookingData(data?.data)
     dispatch({
       type: "BOOKED_DETAILS",
       payload: data?.data
     })
   }
-
-  console.log(BookingData)
 
   const navigate = useNavigate()
   return (

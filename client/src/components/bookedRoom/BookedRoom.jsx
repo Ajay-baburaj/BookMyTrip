@@ -1,23 +1,29 @@
 import React, { useEffect, useState } from 'react'
 import { Box, Button, Container, Grid, Typography } from '@mui/material'
-import { Link, useParams } from 'react-router-dom'
-import { PersonOutline } from '@material-ui/icons';
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import { IndeterminateCheckBox, PersonOutline } from '@material-ui/icons';
+import { useCookies } from 'react-cookie';
 import BedIcon from '@material-ui/icons/Hotel';
-import MailIcon from '@material-ui/icons/Mail';
+import MailIcon from '@material-ui/icons/Mail'
+import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
-import { getBookingDetails, getRoomCmpltURL, payUsingWalletUrl } from '../../utils/APIRoutes';
+import { deleteGuestUrl, getBookingDetails, getRoomCmpltURL, payUsingWalletUrl } from '../../utils/APIRoutes';
+import { toast, Toaster } from 'react-hot-toast';
 
 
 
-function BookedRoom({ profile }) {
+function BookedRoom({ profile, addGuest }) {
     const details = useSelector(state => state?.booking?.details)
     const user = useSelector(state => state.user.user)
     const dispatch = useDispatch()
+    const navigate = useNavigate()
+    const [cookies, setCookie] = useCookies(['accessToken', 'refreshToken'])
     const [hotel, setHotel] = useState()
     const { id } = useParams()
     const [bookingData, setBookingData] = useState();
     const [payUsingWallet, setPayUsingWallet] = useState(false)
+    const [deleteGuests, setDeleteGuests] = useState(false)
     const [room, setRoom] = useState()
     const checkInDate = new Date(details?.checkInDate).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
     const checkOutDate = new Date(details?.checkOutDate).toLocaleString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
@@ -28,7 +34,7 @@ function BookedRoom({ profile }) {
     useEffect(() => {
         getCmpltRoomDtls()
         getBookingData()
-    }, [payUsingWallet])
+    }, [payUsingWallet, deleteGuests, addGuest])
 
     useEffect(() => {
 
@@ -47,12 +53,22 @@ function BookedRoom({ profile }) {
 
 
     const getBookingData = async () => {
-        const booking = await axios.get(`${getBookingDetails}/${details._id}`)
+        const booking = await axios.get(`${getBookingDetails}/${details._id}`,{
+            headers: {
+              withCredentials: true,
+              'Authorization': `Bearer ${cookies?.accessToken}`
+            }
+          })
         setBookingData(booking?.data)
     }
 
     const handleWallet = async () => {
-        const { data } = await axios.put(`${payUsingWalletUrl}/${bookingData?._id}`, {})
+        const { data } = await axios.put(`${payUsingWalletUrl}/${bookingData?._id}`, {},{
+            headers: {
+              withCredentials: true,
+              'Authorization': `Bearer ${cookies?.accessToken}`
+            }
+          })
         dispatch({
             type: "UPDATE_USER",
             payload: data
@@ -60,7 +76,22 @@ function BookedRoom({ profile }) {
         setPayUsingWallet(!payUsingWallet)
     }
 
-    console.log(bookingData)
+    const deleteGuest = async (guestName) => {
+        const { data } = await axios.delete(`${deleteGuestUrl}/?bookingId=${id}&name=${guestName}`,{
+            headers: {
+              withCredentials: true,
+              'Authorization': `Bearer ${cookies?.accessToken}`
+            }
+          })
+        console.log(data)
+        if (data.status) {
+            toast.success('deleted')
+            setDeleteGuests(!deleteGuests)
+        } else {
+            toast.error('something went wrong')
+        }
+    }
+
     return (
         <>
             <Grid sx={{ border: "solid 1px #d4cecd", boxShadow: 10 }}>
@@ -83,7 +114,7 @@ function BookedRoom({ profile }) {
                 </Container>
                 <Container sx={{ display: 'flex', flexDirection: 'column', marginBottom: 3, gap: '10px' }}>
                     <Typography sx={{ fontSize: "16px", fontWeight: "500" }}>{`Room Type: ${room && room?.roomType}`}</Typography>
-                    <Box sx={{ display: 'flex', gap: '1rem' }}>
+                    <Box sx={{ display: 'flex', gap: '1rem' ,marginTop:'5px',marginBottom:'5px'}}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                             <Typography sx={{ fontSize: "14px" }}>No of the guests</Typography>
                             <PersonOutline />
@@ -96,8 +127,18 @@ function BookedRoom({ profile }) {
                         </Box>
                     </Box>
                     <Box>
+                        <Box sx={{display:'flex',gap:'2rem'}}>
+                            <Box sx={{ display: 'flex', gap: '5px' }}>
+                                <Typography>{`${bookingData?.numberOfRooms} Room`}</Typography><>x</>
+                                <Typography>{`${bookingData?.days} Night`}</Typography>
+                            </Box>
+                            <Box>
+                             <Typography>₹ {parseInt(bookingData && bookingData?.roomPrice)*parseInt(bookingData?.numberOfRooms)*parseInt(bookingData?.days)}</Typography>
+                            </Box>
+
+                        </Box>
                         <Box sx={{ display: 'flex', gap: '5px' }}>
-                            <Typography sx={{ fontSize: "16px", fontWeight: "500" }}>{`Price: ₹ ${bookingData && bookingData?.total} `}</Typography>
+                            <Typography sx={{ fontSize: "16px", fontWeight: "500",fontWeight:'bold',color:'red' }}>{`Total : ₹ ${bookingData && bookingData?.total} `}</Typography>
                             <Typography sx={{ color: 'text.disabled' }}>( 12% gst included)</Typography>
                         </Box>
                         {
@@ -127,6 +168,25 @@ function BookedRoom({ profile }) {
 
 
                     </Box>
+                    <Box>
+                        {
+                            bookingData?.guestDetails ? (<>
+                                <h7>Guest details</h7>
+                                {
+                                    bookingData?.guestDetails.map((guest, index) => (
+                                        <Box sx={{ display: 'flex', gap: '25px' }} key={index}>
+                                            <Typography><span>{index + 1}. </span>{guest}</Typography>
+                                            {
+                                                profile ? "" : <DeleteIcon onClick={() => deleteGuest(guest)} sx={{ cursor: "pointer" }} />
+                                            }
+                                            
+
+                                        </Box>
+                                    ))
+                                }
+                            </>) : ''
+                        }
+                    </Box>
 
 
                     {
@@ -145,11 +205,11 @@ function BookedRoom({ profile }) {
                         </>) : ''
                     }
                     {
-                        profile ? "" :  <Link >change your selection</Link>
+                        profile ? "" : <Link to={'/'} >change your selection</Link>
                     }
-                   
-                </Container>
 
+                </Container>
+                <Toaster position="top-center" reverseOrder={false} />
             </Grid>
         </>
     )

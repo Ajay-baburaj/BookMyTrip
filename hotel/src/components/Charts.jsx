@@ -9,9 +9,9 @@ function Charts() {
       <Paper sx={{ width: '500px' }}>
         <UserGraph />
       </Paper>
-      <Paper sx={{ width: '500px' }}>
+      {/* <Paper sx={{ width: '500px' }}>
         <PostGraph />
-      </Paper>
+      </Paper> */}
     </Box>
   );
 }

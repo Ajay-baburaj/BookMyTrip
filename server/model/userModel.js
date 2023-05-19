@@ -36,6 +36,9 @@ const userschema = new mongoose.Schema({
     createdAt:{
         type:Date,
         default:Date.now()
+    },
+    notification:{
+        type:Array
     }
     
 })

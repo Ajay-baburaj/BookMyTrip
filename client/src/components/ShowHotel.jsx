@@ -43,14 +43,11 @@ function ShowHotel({ hotel, search }) {
                     <CardActions>
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%"}}>
                             <Box style={{ display: "flex", alignItems: "center" }} sx={{gap:'10px'}}>
-                                <Typography variant="subtitle1">Excellent</Typography>
+                                <Typography variant="subtitle1">{hotel?.rating && hotel.rating > 8 ? "Excellent" : hotel?.rating && hotel.rating > 6 ? "Good" : "Average"}</Typography>
                                 <Button size="small" variant="contained" color="primary">
-                                    8.9
+                                   {hotel?.rating}
                                 </Button>
                             </Box>
-                            <div style={{ marginLeft: "auto" }}>
-                                {/* Add any additional content here */}
-                            </div>
                         </div>
                     </CardActions>
                 </Grid>

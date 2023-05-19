@@ -3,19 +3,25 @@ import './navbar.css'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-
+import { useCookies } from 'react-cookie';
+import { remove } from 'react-cookie';
 
 
 function Navbar() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const [cookies, setCookie] = useCookies(['accessToken', 'refreshToken']);
 
   const handleLogout = async () => {
     dispatch({
       type: "LOGOUT",
       payload: null
     })
-    navigate("/login")
+    
+    setCookie('accessToken', '', { expires: new Date(0) });
+    setCookie('refreshToken', '', { expires: new Date(0) });
+
+    navigate("/")
   }
 
 
@@ -24,7 +30,7 @@ function Navbar() {
   return (
     <div className='navbar'>
       <div className="navContainer">
-        <span className="logo">BookMytrip</span>
+        <span className="logo" onClick={()=>navigate('/')}>BookMytrip</span>
         {user?.username && user?.username ? (
           <div className="userDisplay" onClick={()=>navigate('/profile')}>
             <img src="https://cdn-icons-png.flaticon.com/512/149/149071.png?w=740&t=st=1679303737~exp=1679304337~hmac=9a0d99da350810dd8e2f71f5127f56af325bc8f2e2e1ba980fd58fff858c483ec" alt="user Image" className="userProPic" />

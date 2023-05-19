@@ -115,7 +115,7 @@ function Login() {
     e.preventDefault()
     const { email, password } = values;
     if (validateForm()) {
-      const { data } = await axios.post(loginUrl, { email, password })
+      const { data } = await axios.post(loginUrl, { email, password },{withCredentials:true})
       console.log(data)
       if (data.status === false) {
         if (data.inValidMail) {
@@ -132,7 +132,6 @@ function Login() {
 
       }
       if (data.status === true) {
-        localStorage.setItem('accesToken', data.accesToken)
         dispatch({
           type: "LOGIN",
           payload: data.userCheck,

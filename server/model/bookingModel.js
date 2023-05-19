@@ -30,6 +30,9 @@ const bookingSchema = new mongoose.Schema({
     total:{
         type:Number,
     },
+    roomPrice:{
+        type:Number
+    },
     displayPrice:{
         type:Number
     },
@@ -62,6 +65,9 @@ const bookingSchema = new mongoose.Schema({
     bookedDate:{
         type:Date,
         default:Date.now()
+    },
+    orderId:{
+        type:String
     }
 })
 

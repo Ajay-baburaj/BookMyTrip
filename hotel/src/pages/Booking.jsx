@@ -57,6 +57,7 @@ function Booking() {
                 end: new Date(booking.checkOutDate),
             }))
             setAllEvents(mappedEvents);
+            console.log(mappedEvents)
         } catch (error) {
             console.error(error);
         }
@@ -69,7 +70,6 @@ function Booking() {
     const handleSelectEvent = (event) => {
         setBookingId(event.id)
         handleOpen()
-        console.log('Selected event:', event);
     }
 
     const style = {

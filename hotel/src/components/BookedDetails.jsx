@@ -45,7 +45,7 @@ function BookedDetails({ bookingId }) {
                             <Box>
                                 <DateRange />
                                 <Typography variant="h8">
-                                    {bookingData?.checkInDate}
+                                    {bookingData?.checkOutDate}
                                 </Typography>
                             </Box>
                         </Box>

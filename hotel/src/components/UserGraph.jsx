@@ -41,7 +41,7 @@ function UserGraph() {
     labels: Object.keys(userCount),
     datasets: [
       {
-        label: 'Number of Users Joined',
+        label: 'Number of booking per day',
         data: Object.values(userCount),
         backgroundColor: '#537188',
       },

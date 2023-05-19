@@ -12,6 +12,7 @@ import ConnectWithTravelers from "../../components/connectWithTravelers/ConnectW
 
 
 const Home = ()=>{
+ 
  return(
     <div>
       <Navbar/>

@@ -22,8 +22,6 @@ const BookedHotel = (data) => {
   const user = useSelector(state => state?.user?.user)
   const navigate = useNavigate();
 
-  console.log("details", data?.data?.hoteldetails?.name)
-
   return (
     <Card onClick={() => navigate(`/booking/details/${data?.data?._id}`)} sx={{ cursor: 'pointer' }}>
       <Grid container spacing={2}>

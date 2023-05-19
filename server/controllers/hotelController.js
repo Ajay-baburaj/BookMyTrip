@@ -403,7 +403,6 @@ module.exports.submitEditRoom = async (req, res, next) => {
 
 
 module.exports.deletePhoto = async (req, res, next) => {
-  console.log('call is coming here')
   console.log(req.query.index, req.query.id)
   try {
     const data = await hotel.findById({ _id: req.query.id })
@@ -462,7 +461,7 @@ module.exports.getBookings = async (req, res, next) => {
     const data = await bookingModel.find({ hotel: new mongoose.Types.ObjectId(hotelId), status: { $ne: 'pending' } })
     const bookings = await Promise.all(data.map(async (booking) => {
       const checkInDate = await getFormattedDate(booking.checkInDate)
-      const checKOutDate = await getFormattedDate(booking.checkOutDate)
+      const checkOutDate = await getFormattedDate(booking.checkOutDate)
       const hotelData = await hotel.findById(booking.hotel)
       const completeHotel = await getWholeImagesOfHotel(hotelData)
       const roomdata = completeHotel.rooms.find((room) => {
@@ -472,7 +471,7 @@ module.exports.getBookings = async (req, res, next) => {
       return {
         ...booking.toJSON(),
         checkInDate,
-        checKOutDate,
+        checkOutDate,
         hoteldetails: completeHotel,
         roomDetails: roomdata
       }
