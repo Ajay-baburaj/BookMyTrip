@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
 import { Box, Button, Container, Grid, Typography } from '@mui/material'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { IndeterminateCheckBox, PersonOutline } from '@material-ui/icons';
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import { useCookies } from 'react-cookie';
-import BedIcon from '@material-ui/icons/Hotel';
-import MailIcon from '@material-ui/icons/Mail'
+import BedIcon from '@mui/icons-material/Bed';
+import MailIcon from '@mui/icons-material/Mail';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import { useDispatch, useSelector } from 'react-redux';
@@ -117,7 +117,7 @@ function BookedRoom({ profile, addGuest }) {
                     <Box sx={{ display: 'flex', gap: '1rem' ,marginTop:'5px',marginBottom:'5px'}}>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                             <Typography sx={{ fontSize: "14px" }}>No of the guests</Typography>
-                            <PersonOutline />
+                            <PersonOutlineIcon />
                             <Typography sx={{ fontSize: "14px" }}>{bookingData && bookingData?.guests - 1}</Typography>
                         </Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>

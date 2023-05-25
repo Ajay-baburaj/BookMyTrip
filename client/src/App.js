@@ -11,11 +11,9 @@ import Payment from './Pages/payment/Payment';
 import ResetPassword from './Pages/resetPassword/ResetPassword';
 import OtpEnter from './Pages/otp/OtpEnter';
 import Profile from './Pages/Profile';
-import OrderSuccessfull from './Pages/OrderSuccessfull'
 import BookingDetails from './Pages/BookingDetails';
 import { IsLogged } from './Auth/auth';
 import Search from './Pages/Search';
-import slugify from 'react-slugify';
 
 function App() {
   return (
@@ -35,7 +33,6 @@ function App() {
           <Route element={<Booking />} exact path="/booking/:id" />
           <Route element={<Payment />} exact path="/payment" />
           <Route element={<Profile />} exact path='/profile' />
-          <Route element={<OrderSuccessfull />} exact path='/order/sucess' />
           <Route element={<BookingDetails />} exact path='/booking/details/:id' />
         </Route>
       </Routes>
