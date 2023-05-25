@@ -2,14 +2,11 @@ const express = require('express')
 const cors = require('cors')
 const mongoose = require('mongoose');
 const { ObjectId } = require('mongoose');
-
-const redisClient = require('ioredis');
 const authRoutes = require('./routes/authRoutes')
 const adminRoutes = require('./routes/adminRoutes')
 const hotelRoutes = require('./routes/hotelRoutes')
 const cookieParser = require("cookie-parser");
 require('dotenv').config();
-const redis = new redisClient();
 const app = express()
 
 app.use(cors({
