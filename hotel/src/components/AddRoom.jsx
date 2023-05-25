@@ -5,8 +5,8 @@ import { Box, Grid, Typography, TextField, FormControl, FormLabel, Button } from
 import { deleteRoomImage, hotelRoomDetailsSubmit, hotelRoomEditSubmit } from '../utils/apiRoutesHotel'
 import { handleError } from "../validations/validateRooms"
 import InputField from '../components/InputField';
-import IconButton from '@material-ui/core/IconButton';
-import CloseIcon from '@material-ui/icons/Close';
+// import IconButton from '@mui/material/IconButton';
+// import CloseIcon from '@material-ui/icons/Close';
 import { useSelector } from 'react-redux';
 import SnackBar from '../components/SnackBar'
 import { useCookies } from 'react-cookie';

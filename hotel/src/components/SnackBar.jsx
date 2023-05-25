@@ -1,5 +1,5 @@
 import Snackbar from '@mui/material/Snackbar';
-import Alert from '@material-ui/lab/Alert'
+import Alert from '@mui/material/Alert';
 import {useState,useEffect} from "react"
 
 import React from 'react'

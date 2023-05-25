@@ -1,14 +1,14 @@
 import React,{useState} from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, Divider, Grid, IconButton, Typography } from '@material-ui/core';
-import { LocationOn, Phone, RoomService } from '@material-ui/icons';
+import { makeStyles } from '@mui/styles';
+import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, Divider, Grid, IconButton, Typography } from '@mui/material';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import PhoneIcon from '@mui/icons-material/Phone';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { deleteHotelUrl, getDataUrl } from '../utils/apiRoutesHotel';
 import axios from 'axios'
 import { useEffect } from 'react';
-import MuiImageSlider from 'mui-image-slider';
 import ImageSlider from '../components/ImageSlider';
 
 
@@ -117,8 +117,8 @@ const HotelProfile = () => {
           </Typography>
           <Box sx={{ marginTop: "1.5rem" }}>
             <Typography variant="body2" color="textSecondary" component="p">
-              <LocationOn className={classes.icon} />{`${data.street},${data.landmark},${data.city}`}<br />
-              <Phone className={classes.icon} />{data.phone}<br />
+              <LocationOnIcon className={classes.icon} />{`${data.street},${data.landmark},${data.city}`}<br />
+              <PhoneIcon className={classes.icon} />{data.phone}<br />
             </Typography>
           </Box>
 
