@@ -24,7 +24,6 @@
     "react-cookie": "^4.1.1",
     "react-datepicker": "^4.11.0",
     "react-dom": "^18.2.0",
-    "react-google-login": "^5.2.2",
     "react-hot-toast": "^2.4.0",
     "react-icons": "^4.3.1",
     "react-redux": "^8.0.5",
@@ -35,7 +34,7 @@
     "redux-devtools-extension": "^2.13.9",
     "redux-persist": "^6.0.0",
     "scrollreveal": "^4.0.9",
-    "styled-components": "^6.0.0-rc.2",
+    "styled-components": "^5.3.1",
     "web-vitals": "^3.3.1"
   },
   "scripts": {
