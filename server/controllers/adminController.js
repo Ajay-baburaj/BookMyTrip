@@ -22,7 +22,6 @@ module.exports.login = async (req, res, next) => {
     const { email, password } = req.body
     try {
         const adminCredentials = await db.collection("admin").findOne({ email })
-        
         if (adminCredentials) {
             const isValidPassword = await bcrypt.compare(password, adminCredentials.password)
             if (isValidPassword) {
