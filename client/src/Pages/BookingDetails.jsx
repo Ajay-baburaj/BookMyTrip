@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { json, useParams } from 'react-router-dom'
 import { Box, Button, Container, Grid, Typography, Modal } from '@mui/material'
-import { Dialog, DialogTitle, DialogContent, DialogActions } from '@material-ui/core';
+import { Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import { useSelector } from 'react-redux'
 import { toast, Toaster } from 'react-hot-toast'
 import BookedRoom from '../components/bookedRoom/BookedRoom'

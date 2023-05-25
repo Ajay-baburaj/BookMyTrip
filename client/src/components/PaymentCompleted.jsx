@@ -1,4 +1,4 @@
-import { Grid, Box, Typography } from '@material-ui/core';
+import { Grid, Box, Typography } from '@mui/material';
 import React from 'react'
 
 function PaymentCompleted(props) {

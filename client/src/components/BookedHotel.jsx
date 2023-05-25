@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import {
+import { 
   Card,
-  CardHeader,
   CardMedia,
   CardContent,
-  CardActions,
   Box,
   Typography,
-  Button,
-  Grid,
-} from '@material-ui/core';
+  Grid
+} from '@mui/material';
+
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux'
 import { HotelOutlined } from '@mui/icons-material';
-import { DateRange } from '@material-ui/icons';
-import ArrowRightAltIcon from '@material-ui/icons/ArrowRightAlt';
+import DateRangeIcon from '@mui/icons-material/DateRange';
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 import { Badge } from '@mui/material';
 
 
@@ -51,7 +49,7 @@ const BookedHotel = (data) => {
             </Box>
             <Box sx={{ display: 'flex', gap: '20px', justifyContent: 'center' }}>
               <Box sx={{}}>
-                <DateRange />
+                <DateRangeIcon />
                 <Typography variant="h8">
                   {data?.data && data?.data?.checkInDate}
                 </Typography>
@@ -60,7 +58,7 @@ const BookedHotel = (data) => {
                 <ArrowRightAltIcon />
               </Box>
               <Box>
-                <DateRange />
+                <DateRangeIcon />
                 <Typography variant="h8">
                   {data?.data && data?.data?.checkOutDate}
                 </Typography>

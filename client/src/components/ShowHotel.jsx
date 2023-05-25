@@ -1,5 +1,15 @@
 import React from 'react';
-import { Box,Grid, Button, Card, CardActions, CardContent, CardMedia, Typography } from '@material-ui/core';
+import { 
+    Box,
+    Grid,
+    Button,
+    Card,
+    CardActions,
+    CardContent,
+    CardMedia,
+    Typography
+  } from '@mui/material';
+  
 import { useNavigate } from 'react-router-dom';
 
 function ShowHotel({ hotel, search }) {

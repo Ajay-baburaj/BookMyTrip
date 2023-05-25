@@ -1,7 +1,7 @@
 import React from 'react'
 import "./searchItem.css"
 import { useNavigate } from 'react-router-dom';
-import { Box, Typography, Button } from '@material-ui/core';
+import { Box, Typography, Button } from '@mui/material';
 import slugify from 'slugify';
 
 function SearchItem({ hotel, key, search }) {

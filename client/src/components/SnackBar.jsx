@@ -1,5 +1,5 @@
-import Snackbar from '@material-ui/core/Snackbar';
-import MuiAlert from '@material-ui/lab/Alert';
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
 import {useState,useEffect} from "react"
 
 import React from 'react'
@@ -24,9 +24,9 @@ function SnackBar({text,color}) {
     return (
         <div>
             <Snackbar open={state.snackbarOpen} autoHideDuration={6000} anchorOrigin={{ vertical: "top", horizontal: "center" }} onClose={() => setState({ snackbarOpen: false })}>
-                <MuiAlert severity={color} elevation={6} variant="filled">
+                <Alert severity={color} elevation={6} variant="filled">
                     {text}
-                </MuiAlert>
+                </Alert>
             </Snackbar>
         </div>
     )

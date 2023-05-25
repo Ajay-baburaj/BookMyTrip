@@ -4,12 +4,9 @@ import { Box, Grid, TextField, FormLabel, Typography, Button, Modal } from '@mui
 import { useParams,useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import { passwordReset } from '../../utils/APIRoutes';
-import Swal from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
 
 
 function ResetPassword() {
-    const MySwal = withReactContent(Swal)
     const navigate = useNavigate()
    
     const {id,token} = useParams();
