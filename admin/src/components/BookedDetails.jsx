@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { Box, CardContent, Container, Grid, Badge, Typography } from '@mui/material';
 import { DateRange, HotelOutlined, ArrowRightAlt as ArrowRightAltIcon } from '@mui/icons-material';
-import MailIcon from '@material-ui/icons/Mail';
-import { Bed, Person } from '@mui/icons-material'
+import { Bed, Person} from '@mui/icons-material'
+import MailIcon from '@mui/icons-material/Mail';
 import ImageGallery from './ImageGallery';
 import { useSelector } from 'react-redux';
 import { useState } from 'react';

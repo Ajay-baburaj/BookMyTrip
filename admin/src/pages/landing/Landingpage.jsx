@@ -1,14 +1,10 @@
 import { Grid, Paper, Typography ,Box} from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { FiUsers } from 'react-icons/fi';
-import { FaUsersSlash } from 'react-icons/fa';
-import { MdVerified, MdOutlinePostAdd } from 'react-icons/md';
-import { getAllBookingDetails, getAllBookings, getAllUsers } from '../../utils/ApiRoutesAdmin';
+import { getAllBookings, getAllUsers } from '../../utils/ApiRoutesAdmin';
 import { BiHotel } from 'react-icons/bi';
 import { FaMoneyBillAlt } from 'react-icons/fa';
 import { AiOutlineBook } from 'react-icons/ai';
-
-
 import axios from 'axios'
 import Charts from '../../components/Chart';
 
