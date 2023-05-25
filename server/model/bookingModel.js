@@ -24,6 +24,24 @@ const bookingSchema = new mongoose.Schema({
     days:{
         type:Number,
     },
+    numberOfRooms:{
+        type:Number
+    },
+    total:{
+        type:Number,
+    },
+    roomPrice:{
+        type:Number
+    },
+    displayPrice:{
+        type:Number
+    },
+    discountedPrice:{
+        type:Number
+    },
+    walletBalance:{
+        type:Number
+    },
     guests:{
         type:Number,
     },
@@ -31,15 +49,25 @@ const bookingSchema = new mongoose.Schema({
         type:Array
     },
     bookedBy:{
-        type:String
+        type:Object
     },
     totalPrice:{
         type:Number,
     },
     status:{
         type:String,
-        enum:['pending','confirmed','cancelled'],
+        enum:['pending','confirmed','cancelled','completed'],
         default:'pending'
+    },
+    options:{
+        type:Object,
+    },
+    bookedDate:{
+        type:Date,
+        default:Date.now()
+    },
+    orderId:{
+        type:String
     }
 })
 

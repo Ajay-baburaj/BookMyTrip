@@ -89,6 +89,12 @@ const hotelSchema = new mongoose.Schema({
     },
     rooms:{
         type:Array,
+    },
+    reviews:{
+        type:Object
+    },
+    rating:{
+       type:Number 
     }
 
 })

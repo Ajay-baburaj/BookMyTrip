@@ -1,17 +1,17 @@
 import "./booking.css"
 import { Box, Button, Container, Grid, Typography, Modal } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { Navbar } from 'react-bootstrap'
+
 import Header from '../../components/header/Header';
-import { Link } from 'react-router-dom'
 import MailList from '../../components/mailList/MailList';
 import Footer from '../../components/footer/Footer';
 import BookedRoom from '../../components/bookedRoom/BookedRoom';
-import SearchItem from '../../components/searchItem/SearchItem';
+import ShowHotel from '../../components/ShowHotel'
 import { useSelector } from "react-redux";
 import BookingForm from "../../components/BookingForm";
 import { getRoomCmpltURL } from '../../utils/APIRoutes'
 import axios from 'axios'
+import Navbar from "../../components/navbar/Navbar";
 
 
 function Booking() {
@@ -19,6 +19,7 @@ function Booking() {
     const user = useSelector(state => state.user.user)
     const [hotel, setHotel] = useState()
     const [room, setRoom] = useState()
+    const [addGuest, setAddGuest] = useState(false)
 
     useEffect(() => {
         getCmpltRoomDtls()
@@ -28,18 +29,7 @@ function Booking() {
     const getCmpltRoomDtls = async () => {
         const fetchedDetails = await axios.get(`${getRoomCmpltURL}/${details?.hotel}`)
         setHotel(fetchedDetails?.data)
-        console.log(hotel, "hooooo")
-
     }
-
-    useEffect(() => {
-        const roomdata = hotel?.rooms.find((room) => room._id == details.room)
-        console.log(roomdata)
-        setRoom(roomdata)
-    }, [hotel])
-
-
-
 
     return (
         <>
@@ -48,16 +38,13 @@ function Booking() {
             <Box sx={{ marginTop: '5rem', marginLeft: { xs: '2rem', md: '5rem', lg: '5rem' }, marginRight: { xs: '2rem', md: '5rem', lg: '5rem' } }}>
                 <Grid container spacing={5} alignItems="center" sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-start' }}>
                     <Grid item xs={12} md={6} lg={5}>
-                        <BookedRoom details={details} room={room} />
+                        <BookedRoom details={details} room={room} profile={false} addGuest={addGuest} />
                     </Grid>
                     <Grid item xs={12} md={6} lg={6}>
-                        <SearchItem hotel={hotel} search={false} />
-                        <BookingForm />
+                        <ShowHotel hotel={hotel} search={true} />
+                        <BookingForm callback={() => setAddGuest(!addGuest)} />
                     </Grid>
                 </Grid>
-                
-
-
             </Box>
             <MailList></MailList>
             <Footer></Footer>

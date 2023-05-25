@@ -4,6 +4,7 @@ import { composeWithDevTools } from 'redux-devtools-extension';
 import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
 import bookingReducer from "./bookingReducer";
+import bookedReducer from "./bookedReducer";
 
 
 const initialState = {
@@ -34,7 +35,8 @@ const searchReducer = (state = initialState, action) => {
 const rootReducer = combineReducers({
     user: reducer,
     search: searchReducer,
-    booking:bookingReducer
+    booking:bookingReducer,
+    booked:bookedReducer,
 });
 
 const persistConfig = {

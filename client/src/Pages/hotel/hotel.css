@@ -164,6 +164,7 @@
     display: flex;
     flex-direction: column;    
     align-items: flex-start;
+    max-width: 20rem;
     gap: 10px;
 }
 
@@ -178,12 +179,14 @@
     margin-top: 1rem;
 }
 
+.roomImgcontainer{
+    margin-top: 2rem;
+}
+
 .selectContainer{
-    padding: 10%;
+    padding: 25%;
     display: flex;
     flex-direction: column; 
-     justify-content: center;
-    align-items: center;
 }
 .roomFeaturesContainer>span{
     font-size: 12px;

@@ -13,9 +13,10 @@
     flex-direction: column;
 }
 
-.glistImg{
-    width: 100%;
-}
+.glistImg {
+    width: 200px;
+    height: 150px;
+  }
 
 .glHotelName{
   font-weight: 500;  

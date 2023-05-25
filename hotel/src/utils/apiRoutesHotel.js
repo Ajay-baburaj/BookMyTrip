@@ -16,5 +16,7 @@ const hotelRoomEditSubmit = `${host}/edit/submit`
 const deleteHotelUrl = `${host}/delete/hotel`
 const deletePhotoUrl = `${host}/delete/photo`
 const deleteRoomImage =`${host}/delete/room/image`
-
-export {deleteRoomImage,deletePhotoUrl,hotelRoomEditSubmit,deleteHotelUrl,roomEditUrl,hotelLoginUrl,deleteRoomUrl,hotelRoomDetailsSubmit,getRoomDetailsUrl,hotelRegister,hotelInfoSubmit,forgotPasswordUrl,getDataUrl,passwordResetUrl,SignInWithOtpUrl,otpverifyUrl}
+const getHotelWiseBookingUrl = `${host}/get/booking`
+const getAllBookings =`${host}/get/all/bookings`
+const getDayWiseDetails = `${host}/get/day/wise`
+export {getDayWiseDetails,getAllBookings,getHotelWiseBookingUrl,deleteRoomImage,deletePhotoUrl,hotelRoomEditSubmit,deleteHotelUrl,roomEditUrl,hotelLoginUrl,deleteRoomUrl,hotelRoomDetailsSubmit,getRoomDetailsUrl,hotelRegister,hotelInfoSubmit,forgotPasswordUrl,getDataUrl,passwordResetUrl,SignInWithOtpUrl,otpverifyUrl}

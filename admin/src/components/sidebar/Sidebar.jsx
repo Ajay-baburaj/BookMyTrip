@@ -16,6 +16,11 @@ const Sidebar = ({ props }) => {
     const toggle = () => setIsOpen(!isOpen);
     const menuItem = [
         {
+            path:'/admin',
+            name:"DashBoard",
+            icon:<FaRegChartBar />
+        },
+        {
             path: "/admin/users",
             name: "users",
             icon: <FaTh />
