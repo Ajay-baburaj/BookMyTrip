@@ -746,6 +746,7 @@ module.exports.addGuestDetails = async (req, res, next) => {
         }
         console.log(errMessage)
         res.json({ status: false, errMessage })
+        console.log("err")
     }
 };
 
