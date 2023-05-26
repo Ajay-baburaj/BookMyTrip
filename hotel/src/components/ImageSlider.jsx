@@ -1,70 +1,49 @@
 import React from 'react';
-import { makeStyles } from '@mui/styles';
+import { styled } from '@mui/system';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
-import IconButton from '@mui/material/IconButton';
+import { IconButton } from '@mui/material';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    overflow: 'hidden',
-    backgroundColor: theme.palette.background.paper,
-  },
-  imageList: {
-    flexWrap: 'nowrap',
-    // Promote the list into his own layer on Chrome. This cost memory but helps keeping high FPS.
-    transform: 'translateZ(0)',
-  },
-  title: {
-    color: theme.palette.primary.light,
-  },
-  titleBar: {
-    background:
-      'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
-  },
+const RootContainer = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexWrap: 'wrap',
+  justifyContent: 'space-around',
+  overflow: 'hidden',
+  backgroundColor: theme.palette.background.paper,
 }));
 
-/**
- * The example data is structured as follows:
- *
- * import image from 'path/to/image.jpg';
- * [etc...]
- *
- * const itemData = [
- *   {
- *     img: image,
- *     title: 'Image',
- *     author: 'author',
- *   },
- *   {
- *     [etc...]
- *   },
- * ];
- */
-export default function ImageSlider({images}) {
-  const classes = useStyles();
+const ImageListContainer = styled(ImageList)({
+  flexWrap: 'nowrap',
+  transform: 'translateZ(0)',
+});
 
+const TitleBar = styled(ImageListItemBar)({
+  background:
+    'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)',
+});
+
+const ImageSlider = ({ images }) => {
   return (
-    <div className={classes.root}>
-      <ImageList className={classes.imageList} cols={1.5}>
-        {images.map((item,index) => (
+    <RootContainer>
+      <ImageListContainer cols={1.5}>
+        {images.map((item, index) => (
           <ImageListItem key={index}>
-            <img src={item} alt={"hotelimg"} />
-            <ImageListItemBar
-              title={""}
-              classes={{
-                root: classes.titleBar,
-                title: classes.title,
+            <img src={item} alt="hotelimg" />
+            <TitleBar
+              title=""
+              sx={{
+                '& .MuiImageListItemBar-title': {
+                  color: 'primary.light',
+                },
               }}
             />
           </ImageListItem>
         ))}
-      </ImageList>
-    </div>
+      </ImageListContainer>
+    </RootContainer>
   );
-}
+};
+
+export default ImageSlider;
