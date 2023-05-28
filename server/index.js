@@ -24,15 +24,15 @@ mongoose.connect(process.env.MONGO_URL, {
     useUnifiedTopology: true,
 }).then(() => {
     console.log("database connect succesfully")
-}).catch(() => {
+}).catch((err) => {
     console.log(err.message)
 })
 
 
 
-app.use('/', authRoutes)
-app.use('/admin', adminRoutes)
-app.use('/hotel', hotelRoutes)
+app.use('/api', authRoutes)
+app.use('/api/admin', adminRoutes)
+app.use('/api/hotel', hotelRoutes)
 
 
 
@@ -40,4 +40,7 @@ app.use('/hotel', hotelRoutes)
 const server = app.listen(process.env.PORT, () => {
     console.log(`server started at port${process.env.PORT}`)
 })
+
+
+
 

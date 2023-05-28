@@ -16,6 +16,8 @@ import { useDispatch,} from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import InputField from '../../components/InputField';
 import SnackBar from '../../components/SnackBar';
+import { useCookies } from 'react-cookie';
+
 
 
 
@@ -43,6 +45,7 @@ function Login() {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+  const [cookies, setCookie] = useCookies();
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -116,7 +119,6 @@ function Login() {
     const { email, password } = values;
     if (validateForm()) {
       const { data } = await axios.post(loginUrl, { email, password },{withCredentials:true})
-      console.log(data)
       if (data.status === false) {
         if (data.inValidMail) {
           setErrors({
@@ -136,6 +138,8 @@ function Login() {
           type: "LOGIN",
           payload: data.userCheck,
         })
+        setCookie('accessToken',data?.accesToken)
+        setCookie('refreshToken',data?.refreshToken)
 
         navigate('/')
       }

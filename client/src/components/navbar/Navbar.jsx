@@ -18,8 +18,8 @@ function Navbar() {
       payload: null
     })
     
-    setCookie('accessToken', '', { expires: new Date(0) });
-    setCookie('refreshToken', '', { expires: new Date(0) });
+    setCookie('accessToken', '', { expires: new Date(0) })
+    setCookie('refreshToken', '', { expires: new Date(0) })
 
     navigate("/")
   }

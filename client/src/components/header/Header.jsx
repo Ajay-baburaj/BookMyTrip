@@ -1,6 +1,6 @@
 import { faBed, faCab, faCalendar, faParachuteBox, faPerson, faPlane } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Box, Link, Grid, Typography } from '@mui/material';
 import './header.css'
@@ -34,7 +34,7 @@ function Header({ type }) {
   const [openOptions, setOpenOptions] = useState(false)
   const [values, setValues] = useState(1)
   const [city,setCity] = useState([])
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(null);
   const [roomCount, setRoomCount] = useState(1)
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -57,8 +57,6 @@ function Header({ type }) {
     const ratio = 1.5; // ratio of 2 adults to 1 child per room
     const total = options.adult + options.children
     const roomsNeeded = Math.ceil(total / ratio);
-    console.log("total", total)
-    console.log("rooms", roomsNeeded)
     setRoomCount(roomsNeeded)
   }
 
@@ -69,20 +67,23 @@ function Header({ type }) {
     }));
   }, [roomCount]);
 
-  useEffect(() => {
-    axios.get(`${searchCities}/?city=${value}`).then((res) => {
-      setCity(res.data)
-    }).catch((err) => {
-      console.log(err);
-    });
+  useMemo(() => {
+    if(value){
+      axios.get(`${searchCities}/?city=${value}`).then((res) => {
+        setCity(res.data)
+      }).catch((err) => {
+        console.log(err);
+      });
+    }
   }, [value]);
+
+
 
   const handleInputChange = (e) => {
     console.log(e.target.value);
     setValue(e.target.value);
   };
 
-  // console.log(date, options)
   
 
   const handleSearch = () => {

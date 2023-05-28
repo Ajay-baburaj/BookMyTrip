@@ -27,9 +27,7 @@ module.exports.login = async (req, res, next) => {
             if (isValidPassword) {
                 const token = generateToken({ email: email }, jwt_secret, "15m")            
                 const refreshToken = generateToken({ email: email }, refresh_secret, "5d");
-                res.cookie("accessToken", token, { httpOnly: false, maxage: maxAge * 1000, withCredentials: true })
-                res.cookie("refreshToken", refreshToken, { httpOnly: false, maxage: maxAge * 1000, withCredentials: true })
-                res.json({ status: true, msg: "log in successfull", user: adminCredentials.email, accessToken: token })
+                res.json({ status: true, msg: "log in successfull", user: adminCredentials.email, accessToken: token,refreshToken })
             } else {
                 res.json({ paswordStatus: false, msg: "incorrect password" })
             }
