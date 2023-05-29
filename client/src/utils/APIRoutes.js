@@ -1,4 +1,4 @@
-const host = 'http://api.bookmytrip.site/api'
+const host = 'https://api.bookmytrip.site/api'
 
 export const registerUrl = `${host}/register`;
 export const loginUrl = `${host}/login`;
