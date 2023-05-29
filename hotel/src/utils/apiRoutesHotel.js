@@ -1,4 +1,4 @@
-const host = 'http://api.bookmytrip.site/api/hotel'
+const host = 'https://api.bookmytrip.site/api/hotel'
 
 
 const hotelLoginUrl = `${host}/login`
