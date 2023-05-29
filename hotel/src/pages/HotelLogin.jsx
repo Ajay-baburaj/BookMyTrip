@@ -9,10 +9,10 @@ import { handleError, emailValidation } from '../validations/loginValidation'
 import InputField from '../components/InputField'
 import SnackBar from "../components/SnackBar"
 import { HOTEL_INFO, HOTEL_LOGIN } from '../reduxStore/hotelSlice';
-import {useCookie} from 'react-cookie'
+import {useCookies} from 'react-cookie'
 
 function HotelLogin() {
-
+  
   const style = {
     position: 'absolute',
     top: '50%',
@@ -24,11 +24,11 @@ function HotelLogin() {
     boxShadow: 24,
     p: 4,
   };
-
+  
   const dispatch = useDispatch()
+  const [cookies, setCookie] = useCookies([]);
   const [open, setOpen] = React.useState(false);
-  const [cookie,setCookie] = useCookie()
-
+  
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
