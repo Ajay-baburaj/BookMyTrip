@@ -88,12 +88,12 @@ function Hotel() {
         navigate(`/booking/${booking?._id}`)
       } else {
         await axios.post(bookRoomUrl, { ...bookingData }, 
-        //   {
-        //   headers: {
-        //     withCredentials: true,
-        //     'Authorization': `Bearer ${cookies?.accessToken}`
-        //   }
-        // }
+          {
+          headers: {
+            withCredentials: true,
+            'Authorization': `Bearer ${cookies?.accessToken}`
+          }
+        }
         ).then((response) => {
           console.log("response", response)
           dispatch({
