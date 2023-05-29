@@ -15,8 +15,14 @@
 
 }
 
-.hotelImgWrapper{
-    width: 25%;    
+.hotelImgWrapper {
+    width: 25%;
+}
+
+@media only screen and (max-width: 768px) {
+    .hotelImgWrapper {
+        width: 48%;
+    }
 }
 
 .hotelImg{
@@ -198,8 +204,16 @@
     width: 50rem;
     height: 10rem;
     object-fit: cover;
-    
 }
+
+@media only screen and (max-width: 768px) {
+    .carouselImg {
+        width: 10%;
+    }
+}
+
+
+
 
 
 

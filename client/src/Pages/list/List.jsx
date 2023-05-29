@@ -10,7 +10,7 @@ import SearchItem from '../../components/searchItem/SearchItem'
 import useFetch from '../../hooks/useFectch'
 import {getHotels,getHotelImagesURL} from '../../utils/APIRoutes'
 import { LoadingSkeleton } from '../../components/LoadingSkeleton'
-import { Box } from '@mui/material'
+import { Box, Grid } from '@mui/material'
 
 
 function List() {
@@ -144,7 +144,11 @@ console.log(minPrice,maxPrice)
         <div className="listResult">
           {
             hotelImgData && hotelImgData?.map((item,index)=>
-               <SearchItem hotel ={item} key={index} search={true}/>
+            <Grid container spacing={2} sx={{marginTop:'0.5rem'}}>
+              <Grid lg={12} md={10} sm={10}>
+                <SearchItem hotel ={item} key={index} search={true}/>
+              </Grid>
+            </Grid>
              )
           }
           

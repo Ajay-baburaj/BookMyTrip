@@ -11,34 +11,20 @@ import { toast, Toaster } from 'react-hot-toast'
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
+import { bookRoomUrl, deleteReviewUrl, getRoomCmpltURL,validateUserReview, writeReviewUrl } from '../../utils/APIRoutes'
+import {Typography,Box, Button, TextField, FormControl, InputLabel, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import Rating from '@mui/material/Rating';
+import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux'
+import { useCookies } from 'react-cookie';
 import './hotel.css'
 import Header from '../../components/header/Header';
 import Navbar from '../../components/navbar/Navbar';
 import MailList from '../../components/mailList/MailList';
 import Footer from '../../components/footer/Footer';
-import { bookRoomUrl, deleteReviewUrl, getRoomCmpltURL,validateUserReview, writeReviewUrl } from '../../utils/APIRoutes'
-import { makeStyles } from '@mui/styles';
-import {Modal, Backdrop, Fade, Typography,Box, Button, TextField, FormControl, InputLabel, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux'
-import { useCookies } from 'react-cookie';
 
 
 function Hotel() {
-  const useStyles = makeStyles((theme) => ({
-    modal: {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    modalImg: {
-      maxWidth: '90%',
-      maxHeight: '90%',
-    },
-  }));
-
-  const classes = useStyles();
   const hotel = useSelector(state => state)
   const user = useSelector(state => state?.user?.user)
   const booking = useSelector(state => state?.booking?.details)
@@ -229,6 +215,7 @@ function Hotel() {
               ))) : ""
 
             }
+ 
 
           </div>
           <div className="hotelDetails">
@@ -362,7 +349,7 @@ function Hotel() {
                       <Td>
                         <div className="roomDetailsContainer">
                           <h5>{room.roomType}</h5>
-                          <div className="roomImgcontainer" style={{ width: "300px" }}>
+                          <div className="roomImgcontainer" style={{ width: "100%" }}>
                             <Carousel className='carousel'>
                               {room.images && room.images.map((img, idx) => (
                                 <Carousel.Item key={idx}>
@@ -376,24 +363,6 @@ function Hotel() {
                               ))}
                             </Carousel>
                           </div>
-                          <Modal
-                            className={classes.modal}
-                            open={selectedImgIndex !== null}
-                            onClose={() => setSelectedImgIndex(null)}
-                            closeAfterTransition
-                            BackdropComponent={Backdrop}
-                            BackdropProps={{
-                              timeout: 500,
-                            }}
-                          >
-                            <Fade in={selectedImgIndex !== null}>
-                              <img
-                                className={classes.modalImg}
-                                src={room.images[selectedImgIndex]}
-                                alt="modal img"
-                              />
-                            </Fade>
-                          </Modal>
                         </div>
 
                       </Td>

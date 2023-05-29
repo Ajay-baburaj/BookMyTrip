@@ -3,30 +3,17 @@ import {
     Box,
     Grid,
     Button,
-    Card,
     CardActions,
     CardContent,
     CardMedia,
     Typography
   } from '@mui/material';
   
-import { useNavigate } from 'react-router-dom';
-
 function ShowHotel({ hotel, search }) {
-    const navigate = useNavigate();
-    console.log(hotel)
-
-    const commonStyles = {
-        bgcolor: 'background.paper',
-        m: 1,
-        border: 1,
-        width: '5rem',
-        height: '5rem',
-      };
 
     return (
         <>
-            <Grid container spacing={2} sx={{ ...commonStyles, borderColor: 'primary.main' }} >
+            <Grid container spacing={2} >
                 <Grid item xs={12} lg={4}>
                     <CardMedia
                         component="img"
