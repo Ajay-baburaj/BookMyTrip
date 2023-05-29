@@ -1,4 +1,4 @@
-const host = 'http://api.bookmytrip.site/api/admin'
+const host = 'https://api.bookmytrip.site/api/admin'
 
 export const loginUrl = `${host}/login`;
 export const forgotPassword = `${host}/forgot/password`
