@@ -9,6 +9,7 @@ import { handleError, emailValidation } from '../validations/loginValidation'
 import InputField from '../components/InputField'
 import SnackBar from "../components/SnackBar"
 import { HOTEL_INFO, HOTEL_LOGIN } from '../reduxStore/hotelSlice';
+import {useCookie} from 'react-cookie'
 
 function HotelLogin() {
 
@@ -26,6 +27,7 @@ function HotelLogin() {
 
   const dispatch = useDispatch()
   const [open, setOpen] = React.useState(false);
+  const [cookie,setCookie] = useCookie()
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -75,9 +77,11 @@ function HotelLogin() {
         if (response.data.status) {
           if (response.data.hotelCheck.isRegistered === true) {
             dispatch(HOTEL_INFO(response.data.hotelCheck))
+            setCookie('jwt',response?.data?.token)
             navigate("/hotel/profile")
           } else {
             dispatch(HOTEL_LOGIN(response.data.hotelCheck))
+            setCookie('jwt',response?.data?.token)
             navigate('/hotel/info')
           }
         } else {

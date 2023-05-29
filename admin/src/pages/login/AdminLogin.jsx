@@ -70,7 +70,7 @@ function AdminLogin() {
               email:response.data.user
             }
           })
-          setcookie('accessToken',response?.data?.accessToken)
+          setcookie('jwt',response?.data?.accessToken)
           setcookie('refreshToken',response?.data?.refreshToken)
           navigate("/admin")
         }else{

@@ -9,7 +9,7 @@ import store, { persistor } from './reduxStore/authReducer'
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
-<Provider store={store}>
+ <Provider store={store}>
       <PersistGate persistor={persistor}>
          <App />
       </PersistGate>
