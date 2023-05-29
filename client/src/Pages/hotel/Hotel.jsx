@@ -84,15 +84,17 @@ function Hotel() {
       const bookingInDate = new Date(booking?.checkInDate).toDateString()
 
 
-      if (roomId == booking.room && id == booking.hotel && JSON.stringify(options) == JSON.stringify(booking.options) && (checkInDate == bookingInDate && checkOutDate == bookingOutDate)) {
+      if (roomId == booking?.room && id == booking?.hotel && JSON.stringify(options) == JSON.stringify(booking?.options) && (checkInDate == bookingInDate && checkOutDate == bookingOutDate)) {
         navigate(`/booking/${booking?._id}`)
       } else {
-        await axios.post(bookRoomUrl, { ...bookingData }, {
+        await axios.post(bookRoomUrl, { ...bookingData }, 
+          {
           headers: {
             withCredentials: true,
             'Authorization': `Bearer ${cookies?.accessToken}`
           }
-        }).then((response) => {
+        }
+        ).then((response) => {
           console.log("response", response)
           dispatch({
             type: "BOOK_ROOM",

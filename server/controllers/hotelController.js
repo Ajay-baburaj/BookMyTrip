@@ -56,12 +56,10 @@ module.exports.login = async (req, res, next) => {
         const isValidPassword = await bcrypt.compare(password, hotelCheck.password)
         if (isValidPassword) {
           const token = generateToken(hotelCheck._id, process.env.HOTEL_LOGIN_SECRET, "1d")
-          console.log(token)
           res.cookie("jwt", token, { httpOnly: false, maxage: maxAge * 1000, withCredentials: true })
-          console.log(token, "token")
           if (hotelCheck.isRegistered === true) {
             const hotelDetails = await getFullDetails(hotelCheck)
-            res.status(201).json({ status: true, msg: "log in successfull", hotelCheck: hotelDetails?.hotelData })
+            res.status(201).json({ status: true, msg: "log in successfull", hotelCheck: hotelDetails?.hotelData ,token})
           } else {
             res.status(201).json({ status: true, msg: "log in successfull", hotelCheck })
           }

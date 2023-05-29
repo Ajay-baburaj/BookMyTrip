@@ -40,7 +40,8 @@ export default function MenuAppBar() {
         email:null,
       }
     })
-    removeCookie(['jwt','refreshToken'])
+    setCookie('jwt','',{expires:new Date(0)})
+    setCookie('refreshToken', '', { expires: new Date(0) })
     navigate("/admin/login")
   }
 

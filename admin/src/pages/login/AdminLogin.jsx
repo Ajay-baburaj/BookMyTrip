@@ -7,7 +7,7 @@ import InputField from '../../components/InputField';
 import { forgotPassword, loginUrl } from '../../utils/ApiRoutesAdmin';
 import SnackBar from '../../components/SnackBar';
 import { useDispatch } from 'react-redux';
-
+import { useCookies } from 'react-cookie';
 
 function AdminLogin() {
 
@@ -29,6 +29,7 @@ function AdminLogin() {
 
   const [success, setSuccess] = useState(false)
   const [failure, setFailure] = useState(false)
+  const [cookie,setcookie] = useCookies()
 
   const dispatch = useDispatch()
 
@@ -69,6 +70,8 @@ function AdminLogin() {
               email:response.data.user
             }
           })
+          setcookie('jwt',response?.data?.accessToken)
+          setcookie('refreshToken',response?.data?.refreshToken)
           navigate("/admin")
         }else{
           if(response.data.passwordStatus== false){

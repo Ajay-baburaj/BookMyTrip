@@ -1,4 +1,5 @@
-const host = 'http://localhost:5000/hotel'
+const host = 'http://api.bookmytrip.site/api/hotel'
+
 
 const hotelLoginUrl = `${host}/login`
 const hotelRegister = `${host}/register`

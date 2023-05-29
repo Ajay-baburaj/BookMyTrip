@@ -122,13 +122,6 @@ const HotelProfile = () => {
 
         </HotelContent>
         <CardActions>
-          <Button size="small" color="primary" onClick={() => navigate("/hotel/info")} variant='contained'>
-            Edit
-          </Button>
-          <Button size="small" color="danger" variant='contained' onClick={() => handleDelete(hotel._id)}
-          >
-            Delete
-          </Button>
           <Box flexGrow={1} />
           <IconButton aria-label="add to favorites">
           </IconButton>

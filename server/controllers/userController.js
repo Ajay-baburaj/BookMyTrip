@@ -77,6 +77,8 @@ module.exports.login = async (req, res, next) => {
                 return res.json({
                     msg: "loggin succesfull",
                     status: true,
+                    accesToken,
+                    refreshToken,
                     userCheck
                 })
             }

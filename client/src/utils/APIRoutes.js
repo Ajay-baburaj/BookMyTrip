@@ -1,4 +1,4 @@
-const host = 'http://localhost:5000'
+const host = 'http://api.bookmytrip.site/api'
 
 export const registerUrl = `${host}/register`;
 export const loginUrl = `${host}/login`;

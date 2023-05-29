@@ -13,6 +13,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import {useNavigate} from 'react-router-dom'
 import {useSelector,useDispatch} from 'react-redux'
+import{useCookies} from 'react-cookie'
 import { HOTEL_LOGOUT } from '../reduxStore/hotelSlice';
 
 
@@ -20,6 +21,8 @@ import { HOTEL_LOGOUT } from '../reduxStore/hotelSlice';
 export default function MenuAppBar() {
   const [auth, setAuth] = React.useState(true);
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [cookies, setCookie] = useCookies([]);
+
 
 
   const navigate= useNavigate()
@@ -42,6 +45,7 @@ export default function MenuAppBar() {
 
   const handleLogout =()=>{
     dispatch(HOTEL_LOGOUT(null))
+    setCookie('jwt', '', { expires: new Date(0) })
     navigate('/hotel/login')
   }
 
