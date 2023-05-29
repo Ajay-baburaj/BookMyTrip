@@ -32,7 +32,7 @@ function SearchItem({ hotel, key, search }) {
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
           <Box style={{ display: "flex", alignItems: "center" }} sx={{ gap: '10px' }}>
             <Typography variant="subtitle1"  sx={{fontSize:'16px',fontWeight:'bold'}}>{search && hotel?.rating && hotel.rating > 8 ? "Excellent" : hotel?.rating && hotel.rating > 6 ? "Good" : "Average"}</Typography>
-            <Button size="small" variant="contained" color="primary" sx={{fontWeight:'bold'}}>
+            <Button size="xs" variant="contained" color="primary" sx={{fontWeight:'bold'}}>
               <span style={{fontWeight:'bold'}}>{search ? hotel?.rating: ''}</span>
             </Button>
           </Box>

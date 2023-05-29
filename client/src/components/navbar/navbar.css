@@ -1,40 +1,119 @@
-.navbar{
+.navbar {
     height: 50px;
     background-color: #003580;
     display: flex;
     justify-content: center;
-}
-
-.navContainer{
+  }
+  
+  .navContainer {
     width: 100%;
     max-width: 1024px;
     color: white;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-left: 10rem;
-}
-.logo{
-    left: 25px;
+    margin: 0 10px;
+  }
+  
+  .logo {
     font-size: 24px;
     font-weight: 500;
-}
-
-.navButton{
+    cursor: pointer;
+    margin-left: 9rem;
+  }
+  
+  .navButton {
     background-color: aliceblue;
-    margin-left: 20px;
+    margin-left: 10px;
     border: none;
     padding: 5px 10px;
     cursor: pointer;
     color: #303580;
-}
-.userProPic{
-    height:30px;
-    width:30px;
+  }
+  
+  .userProPic {
+    height: 30px;
+    width: 30px;
     border-radius: 20px;
     margin-right: 15px;
-}
-
-.userDisplay{
+  }
+  
+  .userDisplay {
     cursor: pointer;
-}
+  }
+  
+  .mobileMenuToggle {
+    display: none;
+  }
+  
+  .mobileMenuToggle span {
+    display: block;
+    width: 25px;
+    height: 3px;
+    background-color: white;
+    margin-bottom: 5px;
+    transition: transform 0.3s ease-in-out;
+  }
+  
+  .navItems {
+    display: flex;
+    align-items: center;
+  }
+  
+  .navItems.open {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 10px;
+  }
+  
+  @media only screen and (max-width: 768px) {
+    .navContainer {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .logo {
+      margin-top: 10px;
+      margin-bottom: 10px;
+      margin-left: 0px;
+    }
+  
+    .navButton {
+      margin-top: 10px;
+    }
+  
+    .userDisplay {
+      margin-top: 10px;
+    }
+  
+    .mobileMenuToggle {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      cursor: pointer;
+    }
+  
+    .mobileMenuToggle.open span:first-child {
+      transform: translateY(8px) rotate(45deg);
+    }
+  
+    .mobileMenuToggle.open span:nth-child(2) {
+      opacity: 0;
+    }
+  
+    .mobileMenuToggle.open span:last-child {
+      transform: translateY(-8px) rotate(-45deg);
+    }
+  
+    .navItems {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-top: 10px;
+    }
+  
+    .navItems.open {
+      display: flex;
+    }
+  }
+  
