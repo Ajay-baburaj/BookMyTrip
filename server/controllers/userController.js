@@ -641,13 +641,11 @@ module.exports.validateUserForReview = async (req, res, next) => {
         const currentDate = moment(Date.now())
         const bookings = await bookingModel.find({ user, hotel, status: 'completed' }).sort({ checkOutDate: -1 })
         const booking = bookings[0]
-        console.log("booking from validate",booking)
         const checkOutDate = moment(booking?.checkOutDate)
         const duration = moment.duration(currentDate.diff(checkOutDate))
         const differenceInDays = Math.round(duration.asDays())
         const hoteldetails = await hotelModel.findById(hotel)
         const reviewId  = booking?._id + user
-        console.log(reviewId ,"review Id is not coming whyy")
         const userExists = hoteldetails?.reviews?.some(review => JSON.stringify(review.reviewId) === JSON.stringify(reviewId));
         
 
@@ -669,12 +667,8 @@ module.exports.validateUserForReview = async (req, res, next) => {
 module.exports.writeReview = async (req, res, next) => {
     try {
         const { username, userId, hotel, review } = req.body
-        console.log('call is coming here')
-        console.log("hotel",hotel,userId)
         const bookings = await bookingModel.find({user:userId,hotel,status: 'completed' }).sort({ checkOutDate: -1 })
-        console.log("booking",bookings)
         const booking = bookings[0]
-        console.log("booking",booking)
         const reviewId = booking?._id+userId;
         const reviewObj = {
             reviewId,
@@ -727,9 +721,9 @@ module.exports.deleteReview = async (req, res) => {
         const hotelId = req.query.hotel;
         const reviewId = req.query.reviewId;
         await hotelModel.findByIdAndUpdate(hotelId, {
-            $pull: { 'reviews': { reviewId: reviewId } }
+            $pull: { 'reviews': { reviewId } }
         }).then((res)=>{
-            console.log("what is happening")
+            console.log(res)
         }).catch((err)=>{
             console.log(err.message)
         })
