@@ -667,6 +667,8 @@ module.exports.validateUserForReview = async (req, res, next) => {
 module.exports.writeReview = async (req, res, next) => {
     try {
         const { username, userId, hotel, review } = req.body
+        console.log('call is coming here')
+        console.log("hotel",hotel)
         const bookings = await bookingModel.find({ userId, hotel, status: 'completed' }).sort({ checkOutDate: -1 })
         console.log("booking",bookings)
         const booking = bookings[0]
@@ -743,7 +745,6 @@ module.exports.addGuestDetails = async (req, res, next) => {
     const booking = await bookingModel.findById(bookingId);
     const guestCheck = booking.guestDetails.includes(fullName);
     const guestCount = booking.guestDetails.length < booking.guests - 1;
-    console.log(booking)
     if (!guestCheck && guestCount) {
         await bookingModel.findByIdAndUpdate(bookingId, {
             $push: { guestDetails: fullName },
