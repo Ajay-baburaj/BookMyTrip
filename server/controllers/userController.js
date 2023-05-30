@@ -668,8 +668,8 @@ module.exports.writeReview = async (req, res, next) => {
     try {
         const { username, userId, hotel, review } = req.body
         console.log('call is coming here')
-        console.log("hotel",hotel)
-        const bookings = await bookingModel.find({ userId, hotel, status: 'completed' }).sort({ checkOutDate: -1 })
+        console.log("hotel",hotel,userId)
+        const bookings = await bookingModel.find({status: 'completed' }).sort({ checkOutDate: -1 })
         console.log("booking",bookings)
         const booking = bookings[0]
         console.log("booking",booking)
