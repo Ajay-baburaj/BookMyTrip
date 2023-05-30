@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const {register,bookRoom, login, forgotPassword,resetPassword, validateMobile,otpSignIn,getHotels,getHotelImages,getSingleHotelData, countByCity, confirmBooking, verifyPayment, getBooking, retainHotelRoom, getUserWiseBooking, cancelBooking, updateBookedBy, payUsingWallet, searchCities, setReviewNotification, validateUserForReview, writeReview, addGuestDetails, deleteGuest, deleteReview, getHotelsByRating} = require("../controllers/userController")
+const {register,bookRoom, login, forgotPassword,resetPassword, validateMobile,otpSignIn,getHotels,getHotelImages,getSingleHotelData, countByCity, confirmBooking, verifyPayment, getBooking, retainHotelRoom, getUserWiseBooking, cancelBooking, updateBookedBy, payUsingWallet, searchCities, setReviewNotification, validateUserForReview, writeReview, addGuestDetails, deleteGuest, deleteReview, getHotelsByRating, getReviewForEdit} = require("../controllers/userController")
 const {retainRoomCountMiddleware} = require('../middlewares/roomCount')
 const { verifyUser } = require('../middlewares/verifyUser')
 const secret = process.env.USER_SECRER_KEY
@@ -31,4 +31,5 @@ router.post('/add/guest/:id',verifyUser(secret),addGuestDetails)
 router.delete('/delete/guest',verifyUser(secret),deleteGuest)
 router.delete('/delete/review',verifyUser(secret),deleteReview)
 router.get('/hotel/by/rating',getHotelsByRating)
+router.get('/get/review/:id',getReviewForEdit)
 module.exports = router;

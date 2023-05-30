@@ -11,7 +11,7 @@ import { toast, Toaster } from 'react-hot-toast'
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
-import { bookRoomUrl, deleteReviewUrl, getRoomCmpltURL, validateUserReview, writeReviewUrl } from '../../utils/APIRoutes'
+import { bookRoomUrl, deleteReviewUrl, getReviewForEditUrl, getRoomCmpltURL, validateUserReview, writeReviewUrl } from '../../utils/APIRoutes'
 import { Typography, Box, Button, TextField, FormControl, InputLabel, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import Rating from '@mui/material/Rating';
 import { useSelector } from 'react-redux';
@@ -136,7 +136,6 @@ function Hotel() {
           'Authorization': `Bearer ${cookies?.accessToken}`
         }
       })
-      alert(data?.status)
       if (data.status) {
         setShowTextField(!showTextField)
       } else {
@@ -184,6 +183,11 @@ function Hotel() {
     setOpenDialog(false);
     setDeleteStatus(!deleteStatus)
     toast.success("review deleted")
+  }
+
+  const handleEditReview =async(reviewId)=>{
+    const {data} = await axios.get(`${getReviewForEditUrl}/${reviewId}`)
+    alert(data?.review?.userReview)
   }
 
 
@@ -276,6 +280,7 @@ function Hotel() {
                     {user && review.userId === user._id && (
                       <Box sx={{ display: 'flex', gap: '25px', fontWeight: 'bold', marginTop: '1rem', cursor: 'pointer' }}>
                         <Typography color='red' fontWeight='bold' onClick={() => setOpenDialog(true)}>delete</Typography>
+                        <Typography color='primary' fontWeight='bold' onClick={()=>handleEditReview(review.reviewId)}>edit</Typography>
                       </Box>
                     )}
                     {/* Confirmation Dialog */}
@@ -339,61 +344,61 @@ function Hotel() {
 
 
         <div className="selectRoom">
-        <Table className="table">
-  <TableHead>
-    <TableRow>
-      <TableCell>Rooms</TableCell>
-      <TableCell>Amenities</TableCell>
-      <TableCell>Price</TableCell>
-    </TableRow>
-  </TableHead>
-  <TableBody>
-    {details?.rooms && details.rooms.map((room) => {
-      if (room.numberOfRooms >= search.options.room) {
-        return (
-          <TableRow key={room._id}>
-            <TableCell>
-              <div className="roomDetailsContainer">
-                <Typography variant="h5">{room.roomType}</Typography>
-                <div className="roomImgcontainer" style={{ width: '100%' }}>
-                  <Carousel className="carousel">
-                    {room.images && room.images.map((img, idx) => (
-                      <Carousel.Item key={idx}>
-                        <img
-                          className="w-100 carouselImg"
-                          src={img}
-                          alt="room photos"
-                          onClick={() => handleImgClick(idx)}
-                        />
-                      </Carousel.Item>
-                    ))}
-                  </Carousel>
-                </div>
-              </div>
-            </TableCell>
-            <TableCell>
-              <div className="roomFeaturesContainer">
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
-                  <Bed />
-                  <CompareArrows />
-                </Box>
-                <Typography variant="body1" style={{ marginBottom: '10px' }}>{room.roomDesc}</Typography>
-                <Typography variant="body1">{room.amenities}</Typography>
-              </div>
-            </TableCell>
-            <TableCell>
-              <div className="selectContainer">
-                <Typography variant="body1">₹ {room.price}</Typography>
-                <Button onClick={() => handleBooking(room._id)}>Select Room</Button>
-              </div>
-            </TableCell>
-          </TableRow>
-        );
-      }
-      return null;
-    })}
-  </TableBody>
-</Table>
+          <Table className="table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Rooms</TableCell>
+                <TableCell>Amenities</TableCell>
+                <TableCell>Price</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {details?.rooms && details.rooms.map((room) => {
+                if (room.numberOfRooms >= search.options.room) {
+                  return (
+                    <TableRow key={room._id}>
+                      <TableCell>
+                        <div className="roomDetailsContainer">
+                          <Typography variant="h5">{room.roomType}</Typography>
+                          <div className="roomImgcontainer" style={{ width: '100%' }}>
+                            <Carousel className="carousel">
+                              {room.images && room.images.map((img, idx) => (
+                                <Carousel.Item key={idx}>
+                                  <img
+                                    className="w-100 carouselImg"
+                                    src={img}
+                                    alt="room photos"
+                                    onClick={() => handleImgClick(idx)}
+                                  />
+                                </Carousel.Item>
+                              ))}
+                            </Carousel>
+                          </div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="roomFeaturesContainer">
+                          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
+                            <Bed />
+                            <CompareArrows />
+                          </Box>
+                          <Typography variant="body1" style={{ marginBottom: '10px' }}>{room.roomDesc}</Typography>
+                          <Typography variant="body1">{room.amenities}</Typography>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="selectContainer">
+                          <Typography variant="body1">₹ {room.price}</Typography>
+                          <Button onClick={() => handleBooking(room._id)}>Select Room</Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  );
+                }
+                return null;
+              })}
+            </TableBody>
+          </Table>
           <Toaster position="top-center" reverseOrder={false} />
         </div>
       </div>
