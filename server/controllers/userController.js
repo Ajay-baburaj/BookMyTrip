@@ -720,6 +720,7 @@ module.exports.deleteReview = async (req, res) => {
     try {
         const hotelId = req.query.hotel;
         const reviewId = req.query.reviewId;
+        console.log(hotelId,reviewId)
         await hotelModel.findByIdAndUpdate(hotelId, {
             $pull: { 'reviews': { reviewId } }
         }).then((res)=>{
@@ -732,6 +733,8 @@ module.exports.deleteReview = async (req, res) => {
         console.log(err.message);
     }
 };
+
+
 
 
 module.exports.addGuestDetails = async (req, res, next) => {
