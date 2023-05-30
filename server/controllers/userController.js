@@ -746,6 +746,36 @@ module.exports.deleteReview = async (req, res) => {
     }
 };
 
+module.exports.editReviewSubmit = async(req,res)=>{
+    try{
+        const reviewId = req.params.id
+        const hotelId = req.params.hotelId
+    
+        const updatedReview = req.body.review;
+        const updatedRating = req.body.rating;
+    
+        const hotel = await hotelModel.findOneAndUpdate(
+            {
+              _id: hotelId,
+              "reviews.reviewId": reviewId,
+            },
+            {
+              $set: {
+                "reviews.$.review": updatedReview,
+                "reviews.$.rating": updatedRating,
+              },
+            },
+          )
+          res.status(200).json({status:true})
+    }catch(err){
+        console.log(err.message)
+    }
+ 
+}
+
+
+
+ 
 
 
 

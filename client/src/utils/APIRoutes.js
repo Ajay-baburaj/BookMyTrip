@@ -26,3 +26,4 @@ export const addGuestUrl = `${host}/add/guest`
 export const deleteGuestUrl =`${host}/delete/guest`
 export const getRatingWiseHotelUrl = `${host}/hotel/by/rating`
 export const getReviewForEditUrl = `${host}/get/review`
+export const editedReviewSubmitUrl = `${host}/submit/edit/review`

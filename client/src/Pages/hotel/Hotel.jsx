@@ -11,7 +11,7 @@ import { toast, Toaster } from 'react-hot-toast'
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
-import { bookRoomUrl, deleteReviewUrl, getReviewForEditUrl, getRoomCmpltURL, validateUserReview, writeReviewUrl } from '../../utils/APIRoutes'
+import { bookRoomUrl, deleteReviewUrl, editedReviewSubmitUrl, getReviewForEditUrl, getRoomCmpltURL, validateUserReview, writeReviewUrl } from '../../utils/APIRoutes'
 import { Typography, Box, Button, TextField, FormControl, InputLabel, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import Rating from '@mui/material/Rating';
 import { useSelector } from 'react-redux';
@@ -44,8 +44,10 @@ function Hotel() {
   const [showTextField, setShowTextField] = useState(false)
   const [review, setReview] = useState({ rating: '', review: '' })
   const [reviewAdded, setReviewAdded] = useState(false)
+  const [editStatus,setEditStatus] = useState(false)
   const [deleteStatus, setDeleteStatus] = useState(false)
   const [reviewEdit,setReviewEdit] = useState()
+  const [render,setRender] = useState(false)
   const { id } = useParams()
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -58,7 +60,7 @@ function Hotel() {
 
   useEffect(() => {
     getCmpltRoomDtls()
-  }, [reviewAdded, deleteStatus])
+  }, [reviewAdded, deleteStatus,render])
 
   const handleBooking = async (roomId) => {
     if (user) {
@@ -160,17 +162,17 @@ function Hotel() {
       review,
       hotel: id
     }
-    const { data } = await axios.post(writeReviewUrl, reviewObj, {
-      headers: {
-        withCredentials: true,
-        'Authorization': `Bearer ${cookies?.accessToken}`
-      }
-    })
-    if (data?.status) {
-      toast.success(data?.msg)
-      setReviewAdded(!reviewAdded)
-      setShowTextField(false)
-    }
+      const { data } = await axios.post(writeReviewUrl, reviewObj, {
+        headers: {
+          withCredentials: true,
+          'Authorization': `Bearer ${cookies?.accessToken}`
+        }
+      })
+      if (data?.status) {
+        toast.success(data?.msg)
+        setReviewAdded(!reviewAdded)
+        setShowTextField(false)
+      } 
   }
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -185,15 +187,22 @@ function Hotel() {
     setDeleteStatus(!deleteStatus)
     toast.success("review deleted")
   }
+  const handleEditReview =(review)=>{
+    setShowTextField(!showTextField)
+    setEditStatus(true)
+    const {userReview,rating} = review
+    setReview({...review,review:userReview,rating})
+    setReviewEdit(review)
+  }
 
-  const handleEditReview =async(reviewId)=>{
-    const {data} = await axios.get(`${getReviewForEditUrl}/${reviewId}`)
+
+  const handleEditReviewSubmit = async(reviewId)=>{
+    const {data} = await axios.put(`${editedReviewSubmitUrl}/${reviewId}/${id}`,review)
     if(data?.status){
-      alert('cALL IS COMING')
-      setReviewEdit(data?.review)
-      setShowTextField(!showTextField)
+      setRender(!render)
+    }else{
+      alert('some thing went wrong')
     }
-
   }
 
 
@@ -286,7 +295,7 @@ function Hotel() {
                     {user && review.userId === user._id && (
                       <Box sx={{ display: 'flex', gap: '25px', fontWeight: 'bold', marginTop: '1rem', cursor: 'pointer' }}>
                         <Typography color='red' fontWeight='bold' onClick={() => setOpenDialog(true)}>delete</Typography>
-                        <Typography color='primary' fontWeight='bold' onClick={()=>handleEditReview(review.reviewId)}>edit</Typography>
+                        <Typography color='primary' fontWeight='bold' onClick={()=>handleEditReview(review)}>edit</Typography>
                       </Box>
                     )}
                     {/* Confirmation Dialog */}
@@ -322,7 +331,7 @@ function Hotel() {
                       labelId="rating-label"
                       label="Rating"
                       name="rating"
-                      defaultValue={reviewEdit ? reviewEdit?.rating:"excellent"}
+                      value ={review.rating}
                       onChange={(e) => handleChange(e)}
                     >
                       <MenuItem value="good">Good</MenuItem>
@@ -339,10 +348,13 @@ function Hotel() {
                     variant="outlined"
                     fullWidth
                     name='review'
-                    defaultValue ={reviewEdit ? reviewEdit?.userReview:""}
+                    value={review?.review}
                     onChange={(e) => handleChange(e)}
                   />
-                  <Button onClick={handleReviewSubmit}>submit</Button>
+                  {
+                   editStatus ? <Button onClick={()=>handleEditReviewSubmit(reviewEdit?.reviewId)}>submit edit</Button>:
+                    <Button onClick={handleReviewSubmit}>submit</Button>
+                  }
                 </Box>
               }
             </Box>
@@ -386,12 +398,12 @@ function Hotel() {
                       </TableCell>
                       <TableCell>
                         <div className="roomFeaturesContainer">
-                          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                             <Bed />
                             <CompareArrows />
                           </Box>
-                          <Typography variant="body1" style={{ marginBottom: '10px' }}>{room.roomDesc}</Typography>
-                          <Typography variant="body1">{room.amenities}</Typography>
+                          <Typography variant="body1" style={{ marginBottom: '10px',fontSize:'14px'}}>{room.roomDesc}</Typography>
+                          {/* <Typography variant="body1">{room.amenities}</Typography> */}
                         </div>
                       </TableCell>
                       <TableCell>
