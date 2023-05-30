@@ -720,7 +720,8 @@ module.exports.getReviewForEdit =async(req,res)=>{
     console.log("call is coming here")
     try{
         const reviewId = req.params.id
-        const review = hotelModel.findOne({ "reviews.reviewId": reviewId }, { "reviews.$": 1 })
+        const review = await hotelModel.findOne({ "reviews.reviewId": reviewId }, { "reviews.$": 1 })
+        
         console.log(review)
     }catch(err){
         console.log(err.message)
