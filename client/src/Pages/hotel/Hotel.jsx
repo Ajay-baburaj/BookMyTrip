@@ -45,6 +45,7 @@ function Hotel() {
   const [review, setReview] = useState({ rating: '', review: '' })
   const [reviewAdded, setReviewAdded] = useState(false)
   const [deleteStatus, setDeleteStatus] = useState(false)
+  const [reviewEdit,setReviewEdit] = useState()
   const { id } = useParams()
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -187,7 +188,12 @@ function Hotel() {
 
   const handleEditReview =async(reviewId)=>{
     const {data} = await axios.get(`${getReviewForEditUrl}/${reviewId}`)
-    alert(data?.review?.userReview)
+    if(data?.status){
+      alert('cALL IS COMING')
+      setReviewEdit(data?.review)
+      setShowTextField(!showTextField)
+    }
+
   }
 
 
@@ -316,6 +322,7 @@ function Hotel() {
                       labelId="rating-label"
                       label="Rating"
                       name="rating"
+                      defaultValue={reviewEdit ? reviewEdit?.rating:"excellent"}
                       onChange={(e) => handleChange(e)}
                     >
                       <MenuItem value="good">Good</MenuItem>
@@ -332,6 +339,7 @@ function Hotel() {
                     variant="outlined"
                     fullWidth
                     name='review'
+                    defaultValue ={reviewEdit ? reviewEdit?.userReview:""}
                     onChange={(e) => handleChange(e)}
                   />
                   <Button onClick={handleReviewSubmit}>submit</Button>
