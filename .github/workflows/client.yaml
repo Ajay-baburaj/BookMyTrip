@@ -2,8 +2,7 @@ name: ReactApp
 
 on:
   push:
-    branches: [ "main" ]
-
+    branches: [ "main" ]      
 defaults:
   run:
     working-directory: ./client
