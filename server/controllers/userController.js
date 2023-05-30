@@ -721,11 +721,14 @@ module.exports.deleteReview = async (req, res) => {
     try {
         const hotelId = req.query.hotel;
         const reviewId = req.query.reviewId;
-    
-        const deletedReview = await hotelModel.findByIdAndUpdate(hotelId, {
+        console.log(reviewId)
+        await hotelModel.findByIdAndUpdate(hotelId, {
             $pull: { 'reviews': { reviewId: reviewId } }
-        });
-
+        }).then((res)=>{
+            console.log(res)
+        }).catch((err)=>{
+            console.log(err.message)
+        })
         res.status(200).json({ status: true, msg: "review deleted" });
     } catch (err) {
         console.log(err.message);
