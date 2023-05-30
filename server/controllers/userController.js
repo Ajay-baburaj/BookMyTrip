@@ -641,13 +641,15 @@ module.exports.validateUserForReview = async (req, res, next) => {
         const currentDate = moment(Date.now())
         const bookings = await bookingModel.find({ user, hotel, status: 'completed' }).sort({ checkOutDate: -1 })
         const booking = bookings[0]
-
+        console.log("booking from validate",booking)
         const checkOutDate = moment(booking?.checkOutDate)
         const duration = moment.duration(currentDate.diff(checkOutDate))
         const differenceInDays = Math.round(duration.asDays())
         const hoteldetails = await hotelModel.findById(hotel)
         const reviewId  = booking?._id + user
-        const userExists = hoteldetails.reviews.some(review => JSON.stringify(review.reviewId) === JSON.stringify(reviewId));
+        console.log(reviewId ,"review Id is not coming whyy")
+        const userExists = hoteldetails?.reviews?.some(review => JSON.stringify(review.reviewId) === JSON.stringify(reviewId));
+        
 
         if (differenceInDays <= 7 && differenceInDays > 0 && !userExists) {
             res.status(200).json({ status: true, msg: 'you can enter the review' })
