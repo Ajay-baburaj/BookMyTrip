@@ -1,4 +1,4 @@
-const host = 'http://localhost:5000'
+const host = 'https://api.bookmytrip.site/api'
 
 export const registerUrl = `${host}/register`;
 export const loginUrl = `${host}/login`;
@@ -11,3 +11,17 @@ export const getHotelImagesURL = `${host}/get/images`
 export const getRoomCmpltURL = `${host}/get/details`
 export const bookRoomUrl = `${host}/book/room` 
 export const confirmBooking = `${host}/confirm/booking`
+export const getBookingDetails = `${host}/get/booking`
+export const verifyUrl = `${host}/payment/success`
+export const retainRoomUrl = `${host}/room/count`
+export const getUserWiseBookingUrl = `${host}/user/booking`
+export const bookingCancelUrl = `${host}/cancel/booking`
+export const updateBookedByUrl = `${host}/add/bookedby`
+export const payUsingWalletUrl = `${host}/pay/using/wallet`
+export const searchCities = `${host}/search/cities`
+export const validateUserReview = `${host}/validate/user/review`
+export const writeReviewUrl = `${host}/write/review`
+export const deleteReviewUrl = `${host}/delete/review`
+export const addGuestUrl = `${host}/add/guest`
+export const deleteGuestUrl =`${host}/delete/guest`
+export const getRatingWiseHotelUrl = `${host}/hotel/by/rating`

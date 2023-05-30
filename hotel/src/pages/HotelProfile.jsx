@@ -1,44 +1,49 @@
-import React,{useState} from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, Divider, Grid, IconButton, Typography } from '@material-ui/core';
-import { LocationOn, Phone, RoomService } from '@material-ui/icons';
+import React, { useState, useEffect } from 'react';
+import { styled } from '@mui/system';
+import { Avatar, Box, Button, Card, CardActions, CardContent, CardHeader, IconButton, Typography } from '@mui/material';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import PhoneIcon from '@mui/icons-material/Phone';
 import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useCookies } from 'react-cookie';
 import { deleteHotelUrl, getDataUrl } from '../utils/apiRoutesHotel';
-import axios from 'axios'
-import { useEffect } from 'react';
-import MuiImageSlider from 'mui-image-slider';
+import axios from 'axios';
 import ImageSlider from '../components/ImageSlider';
 
+const RootContainer = styled(Box)({
+  backgroundColor: "#F0F0F0",
+  backgroundSize: "cover",
+  padding: "50px"
+});
 
-const useStyles = makeStyles((theme) => ({
+const HotelCard = styled(Card)({
+  maxWidth: 600,
+  margin: '0 auto',
+  marginTop: 'var(--theme-spacing-4)',
+  paddingBottom: "20px"
+});
 
-  root: {
-    maxWidth: 600,
-    margin: '0 auto',
-    marginTop: theme.spacing(4),
-    paddingBottom: "20px"
+const HotelHeader = styled(CardHeader)({
+  display: 'flex',
+  alignItems: 'center'
+});
 
-  },
-  media: {
-    height: 0,
-    paddingTop: '56.25%', // 16:9
-  },
-  rating: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(1),
-  },
-  icon: {
-    marginRight: theme.spacing(1),
-  },
+const HotelTitle = styled(Typography)(({ theme }) => ({
+  fontSize: '1.5rem',
+  fontWeight: 500,
+  letterSpacing: '0.02rem',
 }));
+ 
+const HotelContent = styled(CardContent)({
+  marginTop: "1.5rem"
+});
+
+
 
 const HotelProfile = () => {
   const [cookies, removeCookie, setCookie] = useCookies(['jwt'])
   const [token, setToken] = useState(cookies?.jwt)
   const [data,setData] = useState({})
-  const classes = useStyles();
   const navigate = useNavigate();
   const hotel = useSelector(state => state.hotel.hotel)
 
@@ -79,25 +84,18 @@ const HotelProfile = () => {
   console.log(data)
 
   return (
-    <Box sx={{ backgroundColor: "#F0F0F0", backgroundSize: "cover", padding: "50px" }}>
-      <Card className={classes.root}>
-        <CardHeader
+    <RootContainer>
+       <HotelCard>
+       <HotelHeader
           avatar={
             <Avatar aria-label="hotel">
               {/* {data ? data?.name[0]: ""} */}
             </Avatar>
           }
           title={
-            <Typography
-              variant="h5"
-              sx={{
-                fontSize: '1.5rem',
-                fontWeight: 500,
-                letterSpacing: '0.02rem',
-              }}
-            >
+            <HotelTitle variant="h5">
               {data.name}
-            </Typography>
+            </HotelTitle>
           }
           subheader={data.city}
         />
@@ -109,7 +107,7 @@ const HotelProfile = () => {
             
           }
         </Box>
-        <CardContent>
+        <HotelContent>
           <Typography sx={{ fontSize: "14px", fontWeight: "500", marginBottom: "25px" }}>
             {
               data?.description?.length > 400 ? data?.description.substring(0,400) : data?.description
@@ -117,28 +115,21 @@ const HotelProfile = () => {
           </Typography>
           <Box sx={{ marginTop: "1.5rem" }}>
             <Typography variant="body2" color="textSecondary" component="p">
-              <LocationOn className={classes.icon} />{`${data.street},${data.landmark},${data.city}`}<br />
-              <Phone className={classes.icon} />{data.phone}<br />
+              <LocationOnIcon sx={{ marginRight: "theme.spacing(1)" }} />{`${data.street},${data.landmark},${data.city}`}<br />
+              <PhoneIcon sx={{ marginRight: "theme.spacing(1)" }} />{data.phone}<br />
             </Typography>
           </Box>
 
-        </CardContent>
+        </HotelContent>
         <CardActions>
-          <Button size="small" color="primary" onClick={() => navigate("/hotel/info")} variant='contained'>
-            Edit
-          </Button>
-          <Button size="small" color="danger" variant='contained' onClick={() => handleDelete(hotel._id)}
-          >
-            Delete
-          </Button>
           <Box flexGrow={1} />
           <IconButton aria-label="add to favorites">
           </IconButton>
           <IconButton aria-label="share">
           </IconButton>
         </CardActions>
-      </Card>
-    </Box>
+      </HotelCard>
+    </RootContainer>
 
   );
 };

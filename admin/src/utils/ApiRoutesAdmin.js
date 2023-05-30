@@ -1,4 +1,4 @@
-const host = 'http://localhost:5000/admin'
+const host = 'https://api.bookmytrip.site/api/admin'
 
 export const loginUrl = `${host}/login`;
 export const forgotPassword = `${host}/forgot/password`
@@ -14,3 +14,6 @@ export const getHotelData = `${host}/hotel/data`
 export const getCompleteDetailsUrl = `${host}/get-full/details`
 export const blockHotelUrl = `${host}/block/hotel`
 export const getSingleHotelDetails = `${host}/get/hotel`
+export const getAllBookingDetails = `${host}/get/all/booking`
+export const getAllUsers = `${host}/get/all/users`
+export const getAllBookings = `${host}/get/all/bookings`

@@ -1,10 +1,21 @@
 import React from 'react'
 import "./searchItem.css"
 import { useNavigate } from 'react-router-dom';
-
+import { Box, Typography, Button } from '@mui/material';
+import slugify from 'slugify';
 
 function SearchItem({ hotel, key, search }) {
   const navigate = useNavigate()
+
+  function generateSlugFromObjectId(objectId) {
+    const objectIdString = objectId.toString();
+    const slug = objectIdString.replace(/[^a-z0-9]/gi, '-');
+    return slug;
+  }
+
+  const slug = generateSlugFromObjectId(hotel._id);
+
+
   return (
     <div className='searchItem'>
       <img src={search ? hotel?.hotelImage[0] : hotel?.hotelImage[0]} alt="" className="searchItemImg" />
@@ -18,9 +29,13 @@ function SearchItem({ hotel, key, search }) {
 
       </div>
       <div className="searchItemDetails">
-        <div className="slRating">
-          <span>Excellent</span>
-          <button>8.9</button>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+          <Box style={{ display: "flex", alignItems: "center" }} sx={{ gap: '10px' }}>
+            <Typography variant="subtitle1"  sx={{fontSize:'16px',fontWeight:'bold'}}>{search && hotel?.rating && hotel.rating > 8 ? "Excellent" : hotel?.rating && hotel.rating > 6 ? "Good" : "Average"}</Typography>
+            <Button size="xs" variant="contained" color="primary" sx={{fontWeight:'bold'}}>
+              <span style={{fontWeight:'bold'}}>{search ? hotel?.rating: ''}</span>
+            </Button>
+          </Box>
         </div>
         <div className="slDetailTexts">
           {
@@ -28,9 +43,9 @@ function SearchItem({ hotel, key, search }) {
               <>
                 <span className="slPrice">₹{search ? hotel?.rooms[0]?.price : ""}</span>
                 <span className='slTaxOp'>{search ? "Include taxes and fees" : ""}</span>
-                <button className='slCheckButton' onClick={() => navigate(`/hotels/${hotel._id}`)}>See availability</button>
+                <button className='slCheckButton' onClick={() => navigate(`/hotels/${slug}`)}>See availability</button>
               </>
-            ): ""
+            ) : ""
 
           }
 

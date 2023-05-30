@@ -1,15 +1,18 @@
 import { faBed, faCab, faCalendar, faParachuteBox, faPerson, faPlane } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import React, { useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { useSelector } from 'react-redux'
+import { Box, Link, Grid, Typography } from '@mui/material';
 import './header.css'
+import axios from 'axios'
 import { DateRange } from 'react-date-range';
 import 'react-date-range/dist/styles.css'; // main css file
 import 'react-date-range/dist/theme/default.css'; // theme css file
 import { format } from "date-fns"
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast'
+import { searchCities } from '../../utils/APIRoutes'
+
 
 function Header({ type }) {
 
@@ -29,19 +32,59 @@ function Header({ type }) {
   const [destination, setDestination] = useState("")
   const [options, setOption] = useState({ adult: 1, children: 0, room: 1 })
   const [openOptions, setOpenOptions] = useState(false)
+  const [values, setValues] = useState(1)
+  const [city,setCity] = useState([])
+  const [value, setValue] = useState(null);
+  const [roomCount, setRoomCount] = useState(1)
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
+
   const handleOption = (name, operation) => {
     setOption((prev) => {
+      calculateRoomCount()
       return {
         ...prev,
         [name]: operation === "i" ? options[name] + 1 : options[name] - 1
       }
+
     })
   }
 
-  console.log(date, options)
+
+  function calculateRoomCount() {
+
+    const ratio = 1.5; // ratio of 2 adults to 1 child per room
+    const total = options.adult + options.children
+    const roomsNeeded = Math.ceil(total / ratio);
+    setRoomCount(roomsNeeded)
+  }
+
+  useEffect(() => {
+    setOption(prev => ({
+      ...prev,
+      ['room']: roomCount
+    }));
+  }, [roomCount]);
+
+  useMemo(() => {
+    if(value){
+      axios.get(`${searchCities}/?city=${value}`).then((res) => {
+        setCity(res.data)
+      }).catch((err) => {
+        console.log(err);
+      });
+    }
+  }, [value]);
+
+
+
+  const handleInputChange = (e) => {
+    console.log(e.target.value);
+    setValue(e.target.value);
+  };
+
+  
 
   const handleSearch = () => {
     if (destination == "") {
@@ -53,6 +96,12 @@ function Header({ type }) {
       })
       navigate("/hotels", { state: { destination, date, options } })
     }
+  }
+
+  const handleSearchClick = (data)=>{
+    setValue('');
+      setDestination(data)
+      setCity([])
   }
 
 
@@ -77,8 +126,58 @@ function Header({ type }) {
                 <input type="text"
                   placeholder="Where are you going?"
                   className="headerSearchInput"
-                  onChange={e => setDestination(e.target.value)}
+                  value={value||destination}
+                  onChange={e => handleInputChange(e)}
                 />
+              { city.length > 0 && city?.map((data,index) => (
+            <Box key={index} onClick={()=>handleSearchClick(data)}>
+              <Link
+
+                style={{ textDecoration: 'none' }}
+               
+              >
+                <Grid
+                  sx={{
+                    overflow: 'hidden',
+                    padding: '.2rem 1rem',
+                    '&:hover': {
+                      backgroundColor: '#eee',
+                    },
+                  }}
+                  container
+                  alignItems="center"
+                >
+                
+                  <Grid item>
+                    <Grid container alignItems="center">
+                      <Grid item>
+                        <Typography
+                          sx={{
+                            fontSize: '16px',
+                            fontWeight: '500',
+                            color: '#000',
+                          }}
+                        >
+                          {data}
+                        </Typography>
+                        <Box display="flex" alignItems="center">
+                          <Typography
+                            sx={{
+                              fontSize: '14px',
+                              mr: '6px',
+                              color: '#555',
+                            }}
+                          >
+                          
+                          </Typography>
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </Link>
+            </Box>
+          ))}
               </div>
               <div className="headerSearchItem">
                 <FontAwesomeIcon icon={faCalendar} onClick={() => setOpenDate(!openDate)} className="headerIcon" />

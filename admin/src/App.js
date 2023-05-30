@@ -9,6 +9,7 @@ import BasicTable from "./pages/BasicTable";
 import Hotels from "./pages/Hotels";
 import HotelApprove from "./pages/HotelApprove";
 import { IsLogged } from "./auth/auth";
+import Bookings from "./pages/Bookings";
 export default function App() {
   return (
     <BrowserRouter>
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/admin/users" element={<Sidebar props={<BasicTable />} />} exact />
           <Route path="/admin/hotels/approve" element={<Sidebar props={<HotelApprove />} />} exact />
           <Route path="/admin/hotels" element={<Sidebar props={<Hotels />} />} exact />
+          <Route path ="/admin/bookings" element={<Sidebar props={<Bookings />} />}></Route>
         </Route>
 
       </Routes>

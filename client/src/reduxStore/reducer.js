@@ -27,7 +27,11 @@ const reducer = (state=initialState,action)=>{
         case "LOGOUT":
             return{
                 user: action.payload
-            }    
+            }
+        case "UPDATE_USER":
+            return{
+                user:{...action.payload}
+            }        
 
         default:
             return state;

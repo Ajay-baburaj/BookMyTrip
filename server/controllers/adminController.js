@@ -8,6 +8,9 @@ const { generateToken, verify_JWT_Token } = require('../helper/jwt');
 const hotelModel = require('../model/hotelModel');
 const { getFromS3 } = require('../helper/s3Bucket');
 const {getWholeImagesOfHotel} = require('../helper/loginChecker')
+const bookingModal =require('../model/bookingModel');
+const { getFormattedDate } = require('../helper/dateFormat');
+const bookingModel = require('../model/bookingModel');
 // const { resolveClientEndpointParameters } = require('@aws-sdk/client-s3/dist-types/endpoint/EndpointParameters');
 const maxAge = 3 * 24 * 60 * 60
 
@@ -22,11 +25,9 @@ module.exports.login = async (req, res, next) => {
         if (adminCredentials) {
             const isValidPassword = await bcrypt.compare(password, adminCredentials.password)
             if (isValidPassword) {
-                const token = generateToken({ email: email }, jwt_secret, "15m")
+                const token = generateToken({ email: email }, jwt_secret, "15m")            
                 const refreshToken = generateToken({ email: email }, refresh_secret, "5d");
-                res.cookie("accessToken", token, { httpOnly: false, maxage: maxAge * 1000, withCredentials: true })
-                res.cookie("refreshToken", refreshToken, { httpOnly: false, maxage: maxAge * 1000, withCredentials: true })
-                res.json({ status: true, msg: "log in successfull", user: adminCredentials.email, accessToken: token })
+                res.json({ status: true, msg: "log in successfull", user: adminCredentials.email, accessToken: token,refreshToken })
             } else {
                 res.json({ paswordStatus: false, msg: "incorrect password" })
             }
@@ -249,5 +250,64 @@ module.exports.getSingleHotel = async(req,res)=>{
     }catch(err){
         res.status(401).json({msg:err.message})
         console.log(err.meassage)
+    }
+}
+
+module.exports.getAllBooking= async(req,res)=>{
+    try{
+        console.log('call is coming here')
+        const data = await bookingModal.find({status:{$ne:'pending'}})
+        const bookings = await Promise.all(data.map(async (booking)=>{
+            const checkInDate = await getFormattedDate(booking.checkInDate)
+            const checKOutDate = await getFormattedDate(booking.checkOutDate)
+            const hotelData = await hotelModel.findById(booking.hotel)
+            const completeHotel = await getWholeImagesOfHotel(hotelData)
+            const roomdata = completeHotel.rooms.find((room)=>{
+                return JSON.stringify(room._id) === JSON.stringify(booking.room)
+            })
+
+            return {
+                ...booking.toJSON(),
+                checkInDate,
+                checKOutDate,
+                hoteldetails:completeHotel,
+                roomDetails:roomdata
+            }
+        }))
+        res.status(200).json(bookings)
+    }catch(err){
+        console.log(err.message)
+    }
+}
+
+module.exports.getAllusers = async(req,res,next)=>{
+    try{
+        const data= await User.find({}).select({
+            username:1,email:1,phone:1,status:1,wallet:1,createdAt:1
+        })
+        res.status(200).json(data)
+
+    }catch(err){
+        console.log(err.message)
+    }
+
+}
+
+module.exports.getBookingsForDashBoard = async (req, res, next) => {
+    try {
+        const data = await bookingModel.find({ status: { $nin: ["pending", "cancelled"] } })
+        const count = data.length
+        let totalSum = 0;
+        for (const booking of data) {
+            totalSum += booking.total;
+        }
+        const hotelCount = await hotel.find({
+            status: true,
+            isRegistered: true,
+            isBlocked: false
+          }).countDocuments()
+        res.status(200).json({data,count,total:totalSum,hotelCount})
+    } catch (err) {
+        console.log(err.message)
     }
 }

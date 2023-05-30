@@ -22,6 +22,11 @@ const Sidebar = ({ props }) => {
     const toggle = () => setIsOpen(!isOpen);
     const menuItem = [
         {
+            path:'/',
+            name:'Dashboard',
+            icon: <FaRegChartBar />
+        },
+        {
             path: "/hotel/info",
             name: "information",
             icon: <FaTh />
@@ -32,7 +37,7 @@ const Sidebar = ({ props }) => {
             icon: <FaUserAlt />
         },
         {
-            path: "/hotel/booking",
+            path: "/hotel/bookings",
             name: "Bookings",
             icon: <FaRegChartBar />
         },

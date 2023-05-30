@@ -2,14 +2,16 @@ import React from 'react'
 import './featured.css'
 import useFetch from '../../hooks/useFectch';
 import {useNavigate} from 'react-router-dom'
+import { useDispatch } from 'react-redux';
 
 
 
 
 function Featured() {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const {data,loading,error} = useFetch(
-    'http://localhost:5000/countByCity?cities=kochi,munnar,alleppy,banglore'
+    'https://api.bookmytrip.site/api/countByCity?cities=kochi,munnar,alleppy,banglore'
   );
   
 
@@ -25,6 +27,10 @@ function Featured() {
   
     const date = [{startDate:currentDate,endDate:nextDay,key:'selection'}]
     const options = {adult:1,children:0,room:1}
+    dispatch({
+      type: "NEW_SEARCH",
+      payload: { destination, date, options }
+    })
 
   
     navigate('/hotels',{state:{destination,date,options}})

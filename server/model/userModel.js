@@ -27,7 +27,20 @@ const userschema = new mongoose.Schema({
     },
     status:{
         type:Boolean
+    },
+    wallet:{
+        type:Number,
+        default:0,
+        min:0
+    },
+    createdAt:{
+        type:Date,
+        default:Date.now()
+    },
+    notification:{
+        type:Array
     }
+    
 })
 
 module.exports = mongoose.model("users",userschema)

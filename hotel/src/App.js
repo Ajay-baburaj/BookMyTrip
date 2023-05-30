@@ -29,7 +29,7 @@ function App() {
               <Route path='/hotel/info' element={<Sidebar props={<Info />} />} exact />
               <Route path='/' element={<Sidebar props={ <Dashboard />} exact/>}/>
               <Route path='/hotel/rooms' element={<Sidebar props={<Rooms />} />} exact />
-              <Route path='/hotel/bookings' element={<Booking props={<Booking />} />} exact />
+              <Route path='/hotel/bookings' element={<Sidebar props={<Booking />} />} exact />
               <Route path='/hotel/profile' element={<Sidebar props={<HotelProfile />} />} exact />
             </Route>
            
