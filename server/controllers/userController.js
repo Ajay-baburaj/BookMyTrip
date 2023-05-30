@@ -668,9 +668,10 @@ module.exports.writeReview = async (req, res, next) => {
     try {
         const { username, userId, hotel, review } = req.body
         const bookings = await bookingModel.find({ userId, hotel, status: 'completed' }).sort({ checkOutDate: -1 })
+        console.log("booking",bookings)
         const booking = bookings[0]
+        console.log("booking",booking)
         const reviewId = booking?._id+userId;
-        const review_id = generateUniqueRandomNumber()
         const reviewObj = {
             reviewId,
             username,
@@ -721,11 +722,10 @@ module.exports.deleteReview = async (req, res) => {
     try {
         const hotelId = req.query.hotel;
         const reviewId = req.query.reviewId;
-        console.log(reviewId)
         await hotelModel.findByIdAndUpdate(hotelId, {
             $pull: { 'reviews': { reviewId: reviewId } }
         }).then((res)=>{
-            console.log(res)
+            console.log("what is happening")
         }).catch((err)=>{
             console.log(err.message)
         })
