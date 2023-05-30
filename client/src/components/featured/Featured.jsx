@@ -11,7 +11,7 @@ function Featured() {
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const {data,loading,error} = useFetch(
-    'http://api.bookmytrip.site/api/countByCity?cities=kochi,munnar,alleppy,banglore'
+    'https://api.bookmytrip.site/api/countByCity?cities=kochi,munnar,alleppy,banglore'
   );
   
 
