@@ -278,7 +278,7 @@ function Hotel() {
                       </DialogContent>
                       <DialogActions>
                         <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-                        <Button onClick={() => handleDelete(review.review_id)} color="error" autoFocus>
+                        <Button onClick={() => handleDelete(review.reviewId)} color="error" autoFocus>
                           Delete
                         </Button>
                       </DialogActions>
