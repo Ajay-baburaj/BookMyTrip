@@ -645,7 +645,7 @@ module.exports.validateUserForReview = async (req, res, next) => {
         const duration = moment.duration(currentDate.diff(checkOutDate))
         const differenceInDays = Math.round(duration.asDays())
         const hoteldetails = await hotelModel.findById(hotel)
-        console.log("hotelDetails",hotelDetails)
+        console.log("hotelDetails",hoteldetails)
         const reviewId  = booking?._id + user
         const userExists = hoteldetails?.reviews?.some(review => JSON.stringify(review.reviewId) === JSON.stringify(reviewId));
         console.log(userExists)
