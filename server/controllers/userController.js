@@ -755,7 +755,7 @@ module.exports.editReviewSubmit = async(req,res)=>{
     
         const updatedReview = req.body.review;
         const updatedRating = req.body.rating;
-    
+        console.log(req.body)
         const hotel = await hotelModel.findOneAndUpdate(
             {
               _id: hotelId,
@@ -771,7 +771,7 @@ module.exports.editReviewSubmit = async(req,res)=>{
                 new:true
             }
           )
-
+        console.log(hotel)
           res.status(200).json({status:true})
     }catch(err){
         console.log(err.message)
