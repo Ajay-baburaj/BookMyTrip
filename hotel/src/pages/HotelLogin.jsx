@@ -78,7 +78,7 @@ function HotelLogin() {
           if (response.data.hotelCheck.isRegistered === true) {
             dispatch(HOTEL_INFO(response.data.hotelCheck))
             setCookie('jwt',response?.data?.token)
-            navigate("/hotel/profile")
+            navigate("/")
           } else {
             dispatch(HOTEL_LOGIN(response.data.hotelCheck))
             setCookie('jwt',response?.data?.token)
