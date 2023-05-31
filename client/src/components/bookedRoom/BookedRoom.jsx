@@ -53,14 +53,12 @@ function BookedRoom({ profile, addGuest }) {
 
 
     const getBookingData = async () => {
-        const booking = await axios.get(`${getBookingDetails}/${id}`,{
+        const booking = await axios.get(`${getBookingDetails}/${details._id}`,{
             headers: {
               withCredentials: true,
               'Authorization': `Bearer ${cookies?.accessToken}`
             }
           })
-          alert('call is coming here')
-          console.log("booking",booking)
         setBookingData(booking?.data)
     }
 
@@ -93,9 +91,6 @@ function BookedRoom({ profile, addGuest }) {
             toast.error('something went wrong')
         }
     }
-
-    console.log(room)
-    console.log(bookingData)
 
     return (
         <>

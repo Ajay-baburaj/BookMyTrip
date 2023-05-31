@@ -54,7 +54,6 @@ function BookingDetails(callback) {
   }
 
   const handleCancel = async (orderId) => {
-    alert(cookies?.accessToken)
     setOpen(false);
       const data = await axios.post(`${bookingCancelUrl}/${orderId}`,{},{
         headers: {
