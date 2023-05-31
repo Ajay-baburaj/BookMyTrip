@@ -648,6 +648,7 @@ module.exports.validateUserForReview = async (req, res, next) => {
         console.log("hotelDetails",hoteldetails)
         const reviewId  = booking?._id + user
         console.log(reviewId)
+        console.log(reviewId)
         const userExists = hoteldetails?.reviews?.some(review => JSON.stringify(review.reviewId) === JSON.stringify(reviewId));
         console.log(userExists)
 
