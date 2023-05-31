@@ -763,7 +763,7 @@ module.exports.editReviewSubmit = async(req,res)=>{
             },
             {
               $set: {
-                "reviews.$.review": updatedReview,
+                "reviews.$.userReview": updatedReview,
                 "reviews.$.rating": updatedRating,
               },
             },
