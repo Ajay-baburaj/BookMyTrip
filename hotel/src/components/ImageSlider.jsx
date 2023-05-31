@@ -1,9 +1,10 @@
 import React from 'react';
-import { styled } from '@mui/system';
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
 import ImageListItemBar from '@mui/material/ImageListItemBar';
 import { IconButton } from '@mui/material';
+import { styled, ThemeProvider, createTheme } from '@mui/material/styles';
+
 import StarBorderIcon from '@mui/icons-material/StarBorder';
 
 const RootContainer = styled('div')(({ theme }) => ({
