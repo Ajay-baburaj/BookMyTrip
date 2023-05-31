@@ -645,12 +645,8 @@ module.exports.validateUserForReview = async (req, res, next) => {
         const duration = moment.duration(currentDate.diff(checkOutDate))
         const differenceInDays = Math.round(duration.asDays())
         const hoteldetails = await hotelModel.findById(hotel)
-        console.log("hotelDetails",hoteldetails)
         const reviewId  = booking?._id + user
-        console.log(reviewId)
-        console.log(reviewId)
         const userExists = hoteldetails?.reviews?.some(review => JSON.stringify(review.reviewId) === JSON.stringify(reviewId));
-        console.log(userExists)
 
         if (differenceInDays <= 7 && differenceInDays > 0 && !userExists) {
             res.status(200).json({ status: true, msg: 'you can enter the review' })
@@ -720,7 +716,6 @@ module.exports.writeReview = async (req, res, next) => {
 }
 
 module.exports.getReviewForEdit =async(req,res)=>{
-    console.log("call is coming here")
     try{
         const reviewId = req.params.id
         const reviewFetch = await hotelModel.findOne({ "reviews.reviewId": reviewId }, { "reviews.$": 1 })
@@ -750,7 +745,6 @@ module.exports.deleteReview = async (req, res) => {
 };
 
 module.exports.editReviewSubmit = async(req,res)=>{
-    console.log("call is coming here")
     try{
         const reviewId = req.params.id
         const hotelId = req.params.hotelId
@@ -774,18 +768,12 @@ module.exports.editReviewSubmit = async(req,res)=>{
                 new:true
             }
           )
-        console.log(hotel)
           res.status(200).json({status:true})
     }catch(err){
         console.log(err.message)
     }
  
 }
-
-
-
- 
-
 
 
 module.exports.addGuestDetails = async (req, res, next) => {
@@ -809,9 +797,7 @@ module.exports.addGuestDetails = async (req, res, next) => {
         } else {
             errMessage = "Guest already exists or guest count exceeded"
         }
-        console.log(errMessage)
         res.json({ status: false, errMessage })
-        console.log("err")
     }
 };
 

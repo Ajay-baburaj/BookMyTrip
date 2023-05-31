@@ -382,7 +382,7 @@ function Hotel() {
                     <TableRow key={room._id}>
                       <TableCell>
                         <div className="roomDetailsContainer">
-                          <Typography variant="h5">{room.roomType}</Typography>
+                          <Typography variant="h5">{room?.roomType}</Typography>
                           <div className="roomImgcontainer" style={{ width: '100%' }}>
                             <Carousel className="carousel">
                               {room.images && room.images.map((img, idx) => (
