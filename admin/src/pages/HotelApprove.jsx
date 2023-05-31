@@ -30,7 +30,7 @@ const HotelApprove = () => {
         const details = await axios.get(hotelApprovalUrl, {
             headers: {
                 withCredentials: true,
-                "Authorization": `Bearer ${cookies?.accessToken}`
+                "Authorization": `Bearer ${cookies?.jwt}`
             }
         })
         setData(details?.data)
@@ -51,7 +51,7 @@ const HotelApprove = () => {
                 const hotelDetails = await axios.get(`${getCompleteDetailsUrl}/?id=${hotel._id}`, {
                     headers: {
                         withCredentials: true,
-                        "Authorization": `Bearer ${cookies?.accessToken}`
+                        "Authorization": `Bearer ${cookies?.jwt}`
                     }
                 })
                 return hotelDetails?.data?.hotelData
@@ -68,7 +68,7 @@ const HotelApprove = () => {
         await axios.put(`${hotelAcceptUrl}/${id}`, {}, {
             headers: {
                 withCredentials: true,
-                "Authorization": `Bearer ${cookies?.accessToken}`
+                "Authorization": `Bearer ${cookies?.jwt}`
             }
         }).then((response) => {
             toast.success("Approval successfull")
@@ -81,12 +81,12 @@ const HotelApprove = () => {
 
    
     const handleDelete = async (id) => {
-    const confirmation = window.confirm("Are you sure want to reject ?")
+    const confirmation = window.confirm("Are you sure want to delete ?")
     if(confirmation){
         await axios.delete(`${hotelRejectUrl}/${id}`, {
             headers: {
                 withCredentials: true,
-                "Authorization": `Bearer ${cookies?.accessToken}`
+                "Authorization": `Bearer ${cookies?.jwt}`
             }
         }).then((response) => {
             toast.success("successfully deleted")

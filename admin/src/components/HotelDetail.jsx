@@ -19,7 +19,7 @@ const HotelDetail = ({ id }) => {
         const details = await axios.get(`${getSingleHotelDetails}/${id}`,{
             headers:{
                 withCredentials:true,
-                "Authorization":`Bearer ${cookies?.accessToken}`
+                "Authorization":`Bearer ${cookies?.jwt}`
             }
         })
         setHotel(details?.data)

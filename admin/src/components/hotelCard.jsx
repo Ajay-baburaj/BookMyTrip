@@ -17,7 +17,7 @@ export const HotelCard = ({ hotel,callback,openfn,closefn,getIdCallback}) => {
         axios.put(`${blockHotelUrl}/${id}`,{},{
           headers:{
               withCredentials:true,
-              "Authorization":`Bearer ${cookies?.accessToken}`
+              "Authorization":`Bearer ${cookies?.jwt}`
           }
       }).then((response)=>{
         console.log(response.data)

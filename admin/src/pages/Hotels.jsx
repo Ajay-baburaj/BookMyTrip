@@ -31,7 +31,7 @@ const Hotels = () => {
     const data = await axios.get(getHotelData, {
       headers: {
         withCredentials: true,
-        "Authorization": `Bearer ${cookies?.accessToken}`
+        "Authorization": `Bearer ${cookies?.jwt}`
       }
     })
     setData(data?.data)
@@ -48,7 +48,7 @@ const Hotels = () => {
         const hotelDetails = await axios.get(`${getCompleteDetailsUrl}/?id=${hotel._id}`, {
           headers: {
             withCredentials: true,
-            "Authorization": `Bearer ${cookies?.accessToken}`
+            "Authorization": `Bearer ${cookies?.jwt}`
           }
         })
         return hotelDetails?.data?.hotelData

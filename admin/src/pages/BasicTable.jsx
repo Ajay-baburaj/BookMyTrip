@@ -21,7 +21,7 @@ export default function BasicTable() {
     axios.get(getUserUrl, {
       headers: {
         withCredentials: true,
-        'Authorization': `Bearer ${cookies?.accessToken}`
+        'Authorization': `Bearer ${cookies?.jwt}`
       }
     }).then((res) => {
       setUsers(res.data);
@@ -35,7 +35,7 @@ export default function BasicTable() {
     axios.post(userBlockUrl, { email }, {
       headers: {
         withCredentials: true,
-        "Authorization": `Bearer ${cookies?.accessToken}`
+        "Authorization": `Bearer ${cookies?.jwt}`
       }
     }).then(() => {
       setBlocked(!blocked)

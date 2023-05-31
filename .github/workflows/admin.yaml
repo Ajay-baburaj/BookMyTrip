@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]      
 defaults:
   run:
-    working-directory: ./client
+    working-directory: ./admin 
 
 jobs:
   build:
@@ -27,8 +27,8 @@ jobs:
       env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           ARGS: "-rlgoDzvc -i --delete"
-          SOURCE: "client/build/"
+          SOURCE: "admin/build/"
           REMOTE_HOST: ${{ secrets.CHOST }}
           REMOTE_USER: ${{ secrets.USERNAME }}
-          TARGET: "/home/ubuntu/client"
+          TARGET: "/home/ubuntu/admin"
           EXCLUDE: "/dist/, /node_modules/"
