@@ -747,6 +747,7 @@ module.exports.deleteReview = async (req, res) => {
 };
 
 module.exports.editReviewSubmit = async(req,res)=>{
+    console.log("call is coming here")
     try{
         const reviewId = req.params.id
         const hotelId = req.params.hotelId
