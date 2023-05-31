@@ -751,6 +751,7 @@ module.exports.editReviewSubmit = async(req,res)=>{
     try{
         const reviewId = req.params.id
         const hotelId = req.params.hotelId
+        console.log(hotelId,reviewId)
     
         const updatedReview = req.body.review;
         const updatedRating = req.body.rating;
@@ -766,7 +767,11 @@ module.exports.editReviewSubmit = async(req,res)=>{
                 "reviews.$.rating": updatedRating,
               },
             },
+            {
+                new:true
+            }
           )
+
           res.status(200).json({status:true})
     }catch(err){
         console.log(err.message)
