@@ -201,6 +201,7 @@ function Hotel() {
     if(data?.status){
       setRender(!render)
       setReview({...review,review:'',rating:''})
+      setShowTextField(false)
       setEditStatus(false)
     }else{
       alert('some thing went wrong')
