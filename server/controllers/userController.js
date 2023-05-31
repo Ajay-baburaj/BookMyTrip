@@ -647,7 +647,7 @@ module.exports.validateUserForReview = async (req, res, next) => {
         const hoteldetails = await hotelModel.findById(hotel)
         const reviewId  = booking?._id + user
         const userExists = hoteldetails?.reviews?.some(review => JSON.stringify(review.reviewId) === JSON.stringify(reviewId));
-        
+        console.log(userExists)
 
         if (differenceInDays <= 7 && differenceInDays > 0 && !userExists) {
             res.status(200).json({ status: true, msg: 'you can enter the review' })

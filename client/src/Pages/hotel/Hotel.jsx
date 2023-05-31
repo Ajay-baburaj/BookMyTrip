@@ -200,6 +200,7 @@ function Hotel() {
     const {data} = await axios.put(`${editedReviewSubmitUrl}/${reviewId}/${id}`,review)
     if(data?.status){
       setRender(!render)
+      setReview({...review,review:'',rating:''})
       setEditStatus(false)
     }else{
       alert('some thing went wrong')
