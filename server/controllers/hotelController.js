@@ -46,8 +46,8 @@ module.exports.register = async (req, res, next) => {
     isRegistered: false,
   });
 
-  res.status(200).json({ status: true, msg: "Registration successful" });
-   next();
+  next();
+  return res.status(200).json({ status: true, msg: "Registration successful" });
 };
 
 
