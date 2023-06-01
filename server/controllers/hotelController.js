@@ -17,33 +17,38 @@ const maxAge = 3 * 24 * 60 * 60
 
 
 module.exports.register = async (req, res, next) => {
-  const { name, email, phone, password, street, landmark, city, pincode } = req.body
-  const hotelCheck = await hotel.findOne({ email })
-  const phoneCheck = await hotel.findOne({ phone })
-  const nameCheck = await hotel.findOne({ email })
-  if (hotelCheck) {
-    return res.status(200).json({ status: false, msd: "hotel already exits" })
+  try{
+    const { name, email, phone, password, street, landmark, city, pincode } = req.body
+    const hotelCheck = await hotel.findOne({ email })
+    const phoneCheck = await hotel.findOne({ phone })
+    const nameCheck = await hotel.findOne({ email })
+    if (hotelCheck) {
+      return res.status(200).json({ status: false, msd: "hotel already exits" })
+    }
+    if (nameCheck) {
+      return res.status(200).json({ status: false, msd: "hotel already exits" })
+    }
+    if (phoneCheck) {
+      return res.status(200).json({ status: false, msd: "hotel already exits" })
+    }
+    const hashedPassword = await bcrypt.hash(password, 10)
+    const hotelData = await hotel.create({
+      name,
+      email,
+      phone,
+      street,
+      landmark,
+      city,
+      pincode,
+      password: hashedPassword,
+      status: false,
+      isRegistered: false,
+    })
+    return res.status(200).json({ status: true, msg: "registration successfull" })
+  }catch(err){
+    console.log(err.message)
   }
-  if (nameCheck) {
-    return res.status(200).json({ status: false, msd: "hotel already exits" })
-  }
-  if (phoneCheck) {
-    return res.status(200).json({ status: false, msd: "hotel already exits" })
-  }
-  const hashedPassword = await bcrypt.hash(password, 10)
-  const hotelData = await hotel.create({
-    name,
-    email,
-    phone,
-    street,
-    landmark,
-    city,
-    pincode,
-    password: hashedPassword,
-    status: false,
-    isRegistered: false,
-  })
-  res.status(200).json({ status: true, msg: "registration successfull" })
+
 }
 
 module.exports.login = async (req, res, next) => {
