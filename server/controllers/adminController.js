@@ -76,7 +76,7 @@ module.exports.forgotPassword = async (req, res, next) => {
             email: adminCredentials.email
         }
         const token = jwt.sign(payload, secret, { expiresIn: "150m" })
-        const link = `http://localhost:3000/admin/reset/password/${adminCredentials._id}/${token}`
+        const link = `https://admin.bookmytrip.site/admin/reset/password/${adminCredentials._id}/${token}`
         let result = emailsender(adminCredentials.email, link)
         res.json({ status: true, msg: "password reset link sent successfully" })
 

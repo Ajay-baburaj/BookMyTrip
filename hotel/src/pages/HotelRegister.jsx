@@ -37,7 +37,6 @@ function HotelRegister() {
     const handleSubmit = async(e) => {
         e.preventDefault()
         if (handleError(values, setErrors)) {
-            console.log("call is coming hre")
            await axios.post(hotelRegister,values)
                 .then(response => {
                    if(response.data.status){
@@ -113,7 +112,7 @@ function HotelRegister() {
                                     callback={(e) => handleChange(e)}
                                     onFocusCallback={() => setErrors(errors.cityError ? errors.cityError : "")} />
                                 <InputField
-                                    formLabel="" // change FormLabel to formLabel
+                                    formLabel=""
                                     label="pincode"
                                     name="pincode"
                                     type="number"

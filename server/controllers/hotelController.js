@@ -43,7 +43,7 @@ module.exports.register = async (req, res, next) => {
     status: false,
     isRegistered: false,
   })
-  return  res.status(200).json({ status: true, msg: "registration successfull" })
+  res.status(200).json({ status: true, msg: "registration successfull" })
 }
 
 module.exports.login = async (req, res, next) => {
@@ -64,7 +64,6 @@ module.exports.login = async (req, res, next) => {
             res.status(201).json({ status: true, msg: "log in successfull", hotelCheck })
           }
         } else {
-          console.log("else 1")
           res.json({ status: false, msg: "incorrect password", passwordError: true })
         }
       } else {
@@ -90,7 +89,7 @@ module, exports.forgotPassword = async (req, res, next) => {
       _id: hotelExits._id
     }
     const token = generateToken(payload, secret, "5m")
-    const link = `http://localhost:3000/hotel/reset/password/${hotelExits._id}/${token}`
+    const link = `https://hotel.bookmytrip.site/hotel/reset/password/${hotelExits._id}/${token}`
     let result = emailsender(hotelExits.email, link)
     res.json({ status: true, msg: "password reset link sent successfully" })
   } else {

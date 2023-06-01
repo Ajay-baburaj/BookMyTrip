@@ -91,20 +91,7 @@ module.exports.login = async (req, res, next) => {
     }
 }
 
-let refreshTokens = []
-
-module.exports.refreshToken = async (req, res) => {
-
-    //take token from userSide
-    const refreshToken = req.body.token
-    //send error if there is no refreshToken
-    if (!refreshToken) {
-        return res.json.status(401).json('you are no authorized')
-    }
-}
-
 const JWT_SECRET = "yoItsDamnSecret"
-
 module.exports.forgotPassword = async (req, res, next) => {
     const { forgotEmail } = req.body
     const userExist = await users.findOne({ email: forgotEmail })
@@ -116,7 +103,7 @@ module.exports.forgotPassword = async (req, res, next) => {
         }
         console.log(payload)
         const token = jwt.sign(payload, secret)
-        const link = `http://localhost:3000/reset/password/${userExist._id}/${token}`
+        const link = `https://bookmytrip.site/reset/password/${userExist._id}/${token}`
         let result = emailsender(userExist.email, link)
         res.json({ status: true })
     } else {
