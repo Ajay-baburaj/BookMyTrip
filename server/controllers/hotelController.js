@@ -22,13 +22,13 @@ module.exports.register = async (req, res, next) => {
   const phoneCheck = await hotel.findOne({ phone })
   const nameCheck = await hotel.findOne({ email })
   if (hotelCheck) {
-    return res.json({ status: false, msd: "hotel already exits" })
+    return res.status(200).json({ status: false, msd: "hotel already exits" })
   }
   if (nameCheck) {
-    return res.json({ status: false, msd: "hotel already exits" })
+    return res.status(200).json({ status: false, msd: "hotel already exits" })
   }
   if (phoneCheck) {
-    return res.json({ status: false, msd: "hotel already exits" })
+    return res.status(200).json({ status: false, msd: "hotel already exits" })
   }
   const hashedPassword = await bcrypt.hash(password, 10)
   const hotelData = await hotel.create({
@@ -43,7 +43,7 @@ module.exports.register = async (req, res, next) => {
     status: false,
     isRegistered: false,
   })
-  return res.json({ status: true, msg: "registration successfull" })
+  return  res.status(200).json({ status: true, msg: "registration successfull" })
 }
 
 module.exports.login = async (req, res, next) => {
