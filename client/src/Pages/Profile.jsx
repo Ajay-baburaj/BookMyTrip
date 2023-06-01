@@ -130,7 +130,7 @@ function Profile() {
                 </Box>
                 <Box sx={{ display: 'flex', gap: '1rem' }}>
                   <Phone />
-                  <Typography variant={"h8"}>{`wallet : ${user?.wallet}`}</Typography>
+                  <Typography variant={"h7"}>{`wallet : ${user?.wallet}`}</Typography>
                 </Box>
               </Box>
             </TabPanel>

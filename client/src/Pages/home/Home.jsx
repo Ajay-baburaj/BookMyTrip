@@ -23,8 +23,8 @@ const Home = ()=>{
         <BrowseProperty/>
         <h1 className="homeTitle">Homes guests love</h1>
         <GuestLove/>
-        <h1 className="homeTitle">Connect withTravellers</h1>
-        <ConnectWithTravelers/>
+        {/* <h1 className="homeTitle">Connect withTravellers</h1> */}
+        {/* <ConnectWithTravelers/> */}
         <MailList/>
         <Footer/>
       </div>

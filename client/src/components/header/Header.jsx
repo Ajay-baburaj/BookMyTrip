@@ -6,8 +6,8 @@ import { Box, Link, Grid, Typography } from '@mui/material';
 import './header.css'
 import axios from 'axios'
 import { DateRange } from 'react-date-range';
-import 'react-date-range/dist/styles.css'; // main css file
-import 'react-date-range/dist/theme/default.css'; // theme css file
+import 'react-date-range/dist/styles.css'; 
+import 'react-date-range/dist/theme/default.css'; 
 import { format } from "date-fns"
 import { useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast'
@@ -17,7 +17,6 @@ import { searchCities } from '../../utils/APIRoutes'
 function Header({ type }) {
 
   const search = (state => console.log("state", state))
-
   const today = new Date();
   const tomorrow = new Date(today);
   tomorrow.setDate(today.getDate() + 1);
@@ -40,25 +39,39 @@ function Header({ type }) {
   const navigate = useNavigate()
 
 
+
   const handleOption = (name, operation) => {
     setOption((prev) => {
-      calculateRoomCount()
+      let updatedValue;
+      if (operation === "i") {
+        updatedValue = prev[name] + 1;
+      } else if (operation === "d") {
+        updatedValue = prev[name] - 1;
+        if (updatedValue < 0) {
+          updatedValue = 0; // Prevent count from going below 0
+        }
+      } else {
+        updatedValue = prev[name];
+      }
+  
+      calculateRoomCount({ ...prev, [name]: updatedValue });
+  
       return {
         ...prev,
-        [name]: operation === "i" ? options[name] + 1 : options[name] - 1
-      }
+        [name]: updatedValue
+      };
+    });
+  };
 
-    })
-  }
-
-
-  function calculateRoomCount() {
-
-    const ratio = 1.5; // ratio of 2 adults to 1 child per room
-    const total = options.adult + options.children
+  function calculateRoomCount(updatedValue) {
+    const ratio = 2;
+    const adultCount = typeof updatedValue.adult === 'number' ? updatedValue.adult : 0;
+    const childrenCount = typeof updatedValue.children === 'number' ? updatedValue.children : 0;
+    const total = adultCount + childrenCount;
     const roomsNeeded = Math.ceil(total / ratio);
-    setRoomCount(roomsNeeded)
+    setRoomCount(roomsNeeded);
   }
+  
 
   useEffect(() => {
     setOption(prev => ({
