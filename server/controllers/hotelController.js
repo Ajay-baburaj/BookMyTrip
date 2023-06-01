@@ -17,20 +17,22 @@ const maxAge = 3 * 24 * 60 * 60
 
 
 module.exports.register = async (req, res, next) => {
-  const { name, email, phone, password, street, landmark, city, pincode } = req.body
-  const hotelCheck = await hotel.findOne({ email })
-  const phoneCheck = await hotel.findOne({ phone })
-  const nameCheck = await hotel.findOne({ email })
+  const { name, email, phone, password, street, landmark, city, pincode } = req.body;
+  const hotelCheck = await hotel.findOne({ email });
+  const phoneCheck = await hotel.findOne({ phone });
+  const nameCheck = await hotel.findOne({ name });
+
   if (hotelCheck) {
-    res.json({ status: false, msd: "hotel already exits" })
+    return res.status(200).json({ status: false, msg: "Hotel already exists" });
   }
   if (nameCheck) {
-    res.json({ status: false, msd: "hotel already exits" })
+    return res.status(200).json({ status: false, msg: "Hotel name already exists" });
   }
   if (phoneCheck) {
-    res.json({ status: false, msd: "hotel already exits" })
+    return res.status(200).json({ status: false, msg: "Phone number already exists" });
   }
-  const hashedPassword = await bcrypt.hash(password, 10)
+
+  const hashedPassword = await bcrypt.hash(password, 10);
   const hotelData = await hotel.create({
     name,
     email,
@@ -42,9 +44,12 @@ module.exports.register = async (req, res, next) => {
     password: hashedPassword,
     status: false,
     isRegistered: false,
-  })
-  res.json({ status: true, msg: "registration successfull" })
-}
+  });
+
+  res.status(200).json({ status: true, msg: "Registration successful" });
+   next();
+};
+
 
 module.exports.login = async (req, res, next) => {
   console.log(req.body)
