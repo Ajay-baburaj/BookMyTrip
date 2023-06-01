@@ -34,11 +34,11 @@ function HotelRegister() {
         setForgotEmail(e.target.value)
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async(e) => {
         e.preventDefault()
         if (handleError(values, setErrors)) {
             console.log("call is coming hre")
-            axios.post(hotelRegister,values)
+           await axios.post(hotelRegister,values)
                 .then(response => {
                    if(response.data.status){
                     toast.success('Registration Successfull')
