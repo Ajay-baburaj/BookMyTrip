@@ -6,7 +6,6 @@ import {
   faLocationDot, faCircleXmark, faCircleArrowLeft, faCircleArrowRight,
   faBed, faArrowsLeftRightToLine
 } from '@fortawesome/free-solid-svg-icons';
-// import { Table, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table';
 import { toast, Toaster } from 'react-hot-toast'
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -44,10 +43,10 @@ function Hotel() {
   const [showTextField, setShowTextField] = useState(false)
   const [review, setReview] = useState({ rating: '', review: '' })
   const [reviewAdded, setReviewAdded] = useState(false)
-  const [editStatus,setEditStatus] = useState(false)
+  const [editStatus, setEditStatus] = useState(false)
   const [deleteStatus, setDeleteStatus] = useState(false)
-  const [reviewEdit,setReviewEdit] = useState()
-  const [render,setRender] = useState(false)
+  const [reviewEdit, setReviewEdit] = useState()
+  const [render, setRender] = useState(false)
   const { id } = useParams()
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -60,7 +59,7 @@ function Hotel() {
 
   useEffect(() => {
     getCmpltRoomDtls()
-  }, [reviewAdded, deleteStatus,render])
+  }, [reviewAdded, deleteStatus, render])
 
   const handleBooking = async (roomId) => {
     if (user) {
@@ -162,17 +161,17 @@ function Hotel() {
       review,
       hotel: id
     }
-      const { data } = await axios.post(writeReviewUrl, reviewObj, {
-        headers: {
-          withCredentials: true,
-          'Authorization': `Bearer ${cookies?.accessToken}`
-        }
-      })
-      if (data?.status) {
-        toast.success(data?.msg)
-        setReviewAdded(!reviewAdded)
-        setShowTextField(false)
-      } 
+    const { data } = await axios.post(writeReviewUrl, reviewObj, {
+      headers: {
+        withCredentials: true,
+        'Authorization': `Bearer ${cookies?.accessToken}`
+      }
+    })
+    if (data?.status) {
+      toast.success(data?.msg)
+      setReviewAdded(!reviewAdded)
+      setShowTextField(false)
+    }
   }
   const [openDialog, setOpenDialog] = useState(false);
 
@@ -187,23 +186,23 @@ function Hotel() {
     setDeleteStatus(!deleteStatus)
     toast.success("review deleted")
   }
-  const handleEditReview =(review)=>{
+  const handleEditReview = (review) => {
     setShowTextField(!showTextField)
     setEditStatus(true)
-    const {userReview,rating} = review
-    setReview({...review,review:userReview,rating})
+    const { userReview, rating } = review
+    setReview({ ...review, review: userReview, rating })
     setReviewEdit(review)
   }
 
 
-  const handleEditReviewSubmit = async(reviewId)=>{
-    const {data} = await axios.put(`${editedReviewSubmitUrl}/${reviewId}/${id}`,review)
-    if(data?.status){
+  const handleEditReviewSubmit = async (reviewId) => {
+    const { data } = await axios.put(`${editedReviewSubmitUrl}/${reviewId}/${id}`, review)
+    if (data?.status) {
       setRender(!render)
-      setReview({...review,review:'',rating:''})
+      setReview({ ...review, review: '', rating: '' })
       setShowTextField(false)
       setEditStatus(false)
-    }else{
+    } else {
       alert('some thing went wrong')
     }
   }
@@ -218,11 +217,13 @@ function Hotel() {
           open &&
           <div className="slider">
             <FontAwesomeIcon icon={faCircleXmark} className="close" onClick={() => setOpen(false)} />
-            <FontAwesomeIcon icon={faCircleArrowLeft} className="arrow" onClick={() => handleMove("l")} />
             <div className="sliderWrapper">
               <img src={details?.hotelImage[slideNumber]} alt="" className="sliderImg" />
             </div>
-            <FontAwesomeIcon icon={faCircleArrowRight} className="arrow" onClick={() => handleMove("r")} />
+            <div className="sliderControls">
+              <FontAwesomeIcon icon={faCircleArrowLeft} className="arrow" onClick={() => handleMove("l")} />
+              <FontAwesomeIcon icon={faCircleArrowRight} className="arrow" onClick={() => handleMove("r")} />
+            </div>
           </div>
         }
         <div className="hotelWrapper">
@@ -298,7 +299,7 @@ function Hotel() {
                     {user && review.userId === user._id && (
                       <Box sx={{ display: 'flex', gap: '25px', fontWeight: 'bold', marginTop: '1rem', cursor: 'pointer' }}>
                         <Typography color='red' fontWeight='bold' onClick={() => setOpenDialog(true)}>delete</Typography>
-                        <Typography color='primary' fontWeight='bold' onClick={()=>handleEditReview(review)}>edit</Typography>
+                        <Typography color='primary' fontWeight='bold' onClick={() => handleEditReview(review)}>edit</Typography>
                       </Box>
                     )}
                     {/* Confirmation Dialog */}
@@ -334,7 +335,7 @@ function Hotel() {
                       labelId="rating-label"
                       label="Rating"
                       name="rating"
-                      value ={review.rating}
+                      value={review.rating}
                       onChange={(e) => handleChange(e)}
                     >
                       <MenuItem value="good">Good</MenuItem>
@@ -355,8 +356,8 @@ function Hotel() {
                     onChange={(e) => handleChange(e)}
                   />
                   {
-                   editStatus ? <Button onClick={()=>handleEditReviewSubmit(reviewEdit?.reviewId)}>submit edit</Button>:
-                    <Button onClick={handleReviewSubmit}>submit</Button>
+                    editStatus ? <Button onClick={() => handleEditReviewSubmit(reviewEdit?.reviewId)}>submit edit</Button> :
+                      <Button onClick={handleReviewSubmit}>submit</Button>
                   }
                 </Box>
               }
@@ -405,7 +406,7 @@ function Hotel() {
                             <Bed />
                             <CompareArrows />
                           </Box>
-                          <Typography variant="body1" style={{ marginBottom: '10px',fontSize:'14px'}}>{room.roomDesc}</Typography>
+                          <Typography variant="body1" style={{ marginBottom: '10px', fontSize: '14px' }}>{room.roomDesc}</Typography>
                           {/* <Typography variant="body1">{room.amenities}</Typography> */}
                         </div>
                       </TableCell>

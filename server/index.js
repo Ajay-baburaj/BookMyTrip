@@ -1,21 +1,16 @@
 const express = require('express')
+const app = express()
 const cors = require('cors')
 const mongoose = require('mongoose');
+require('dotenv').config();
 const { ObjectId } = require('mongoose');
+const cookieParser = require("cookie-parser");
 const authRoutes = require('./routes/authRoutes')
 const adminRoutes = require('./routes/adminRoutes')
 const hotelRoutes = require('./routes/hotelRoutes')
-const cookieParser = require("cookie-parser");
-require('dotenv').config();
-const app = express()
-
-app.use(cors({
-    origin: ['http://localhost:3000','http://localhost:3001','http://localhost:3002'],
-    credentials: true
-}));
 
 
-
+app.use(cors({origin: '*',credentials: true}));
 app.use(express.json())
 app.use(cookieParser())
 
@@ -29,12 +24,9 @@ mongoose.connect(process.env.MONGO_URL, {
 })
 
 
-
 app.use('/api', authRoutes)
 app.use('/api/admin', adminRoutes)
 app.use('/api/hotel', hotelRoutes)
-
-
 
 
 const server = app.listen(process.env.PORT, () => {

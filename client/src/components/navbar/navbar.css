@@ -15,6 +15,14 @@
     margin: 0 10px;
   }
   
+  @media (max-width: 600px) {
+    .navContainer {
+      max-width: 100%;
+      margin: 0;
+    }
+  }
+  
+  
   .logo {
     font-size: 24px;
     font-weight: 500;

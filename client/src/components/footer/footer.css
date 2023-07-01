@@ -1,16 +1,24 @@
-.footer{
+.footer {
     width: 100%;
     max-width: 1024px;
     font-size: 12px;
-}
-
-.footerList{
+  }
+  
+  .footerList {
     width: 100%;
     max-width: 1024px;
     display: flex;
     justify-content: space-between;
     margin-bottom: 50px;
-}
+  }
+  
+  @media (max-width: 600px) {
+    .footer,
+    .footerList {
+      max-width: 100%;
+    }
+  }
+  
 .fList{
     list-style: none;
     padding: 0;
