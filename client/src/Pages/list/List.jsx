@@ -145,7 +145,7 @@ console.log(minPrice,maxPrice)
           {
             hotelImgData && hotelImgData?.map((item,index)=>
             <Grid container spacing={2} sx={{marginTop:'0.5rem'}}>
-              <Grid lg={12} md={10} sm={10}>
+              <Grid lg={12} md={10} sm={12}>
                 <SearchItem hotel ={item} key={index} search={true}/>
               </Grid>
             </Grid>

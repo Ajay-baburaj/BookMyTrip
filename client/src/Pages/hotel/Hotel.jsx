@@ -10,8 +10,9 @@ import { toast, Toaster } from 'react-hot-toast'
 import 'react-super-responsive-table/dist/SuperResponsiveTableStyle.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import axios from 'axios';
+import { styled } from '@mui/material/styles';
 import { bookRoomUrl, deleteReviewUrl, editedReviewSubmitUrl, getReviewForEditUrl, getRoomCmpltURL, validateUserReview, writeReviewUrl } from '../../utils/APIRoutes'
-import { Typography, Box, Button, TextField, FormControl, InputLabel, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
+import { Typography, Box, Button, TextField, FormControl, InputLabel,TableContainer, Select, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions } from '@mui/material';
 import Rating from '@mui/material/Rating';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux'
@@ -56,6 +57,23 @@ function Hotel() {
     setOpen(!open)
   }
 
+  const StyledTable = styled(Table)`
+  border-collapse: collapse;
+  width: 100%;
+`;
+
+const StyledTableCell = styled(TableCell)`
+  padding: 8px;
+`;
+
+const StyledTableRow = styled(TableRow)`
+  background-color: rgba(173, 216, 230, 0.2);
+`;
+
+const ReadMoreButton = styled(Button)`
+  color: blue;
+`;
+
 
   useEffect(() => {
     getCmpltRoomDtls()
@@ -73,7 +91,7 @@ function Hotel() {
         destination,
         options
       }
-
+      
       const checkInDate = new Date(date[0]?.startDate).toDateString()
       const checkOutDate = new Date(date[0]?.endDate).toDateString()
       const bookingOutDate = new Date(booking?.checkOutDate).toDateString()
@@ -110,15 +128,15 @@ function Hotel() {
     const fetchedDetails = await axios.get(`${getRoomCmpltURL}/${id}`)
     setDetails(fetchedDetails?.data)
   }
-
+  
 
   const [selectedImgIndex, setSelectedImgIndex] = useState(null);
-
+  
   const handleImgClick = (index) => {
     setSelectedImgIndex(index);
   };
-
-
+  
+  
   const handleMove = (direction) => {
     let newSlideNumber;
     if (direction === "l") {
@@ -128,7 +146,7 @@ function Hotel() {
     }
     setSlideNumber(newSlideNumber)
   }
-
+  
   const handleReview = async () => {
     const userId = hotel?.user?.user?._id
     if (userId) {
@@ -148,12 +166,12 @@ function Hotel() {
       navigate('/login')
     }
   }
-
+  
   const handleChange = (e) => {
     setReview({ ...review, [e.target.name]: e.target.value })
   }
-
-
+  
+  
   const handleReviewSubmit = async () => {
     const reviewObj = {
       username: user.username,
@@ -193,8 +211,8 @@ function Hotel() {
     setReview({ ...review, review: userReview, rating })
     setReviewEdit(review)
   }
-
-
+  
+  
   const handleEditReviewSubmit = async (reviewId) => {
     const { data } = await axios.put(`${editedReviewSubmitUrl}/${reviewId}/${id}`, review)
     if (data?.status) {
@@ -206,6 +224,18 @@ function Hotel() {
       alert('some thing went wrong')
     }
   }
+  const [expandedRoomId, setExpandedRoomId] = useState('');
+
+  const handleReadMore = (roomId) => {
+    if (expandedRoomId === roomId) {
+      setExpandedRoomId('');
+    } else {
+      setExpandedRoomId(roomId);
+    }
+  };
+
+  const isRoomDescriptionExpanded = (roomId) => expandedRoomId === roomId;
+
 
 
   return (
@@ -365,66 +395,77 @@ function Hotel() {
           </Box>
 
         </div>
-
-
-        <div className="selectRoom">
-          <Table className="table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Rooms</TableCell>
-                <TableCell>Amenities</TableCell>
-                <TableCell>Price</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {details?.rooms && details.rooms.map((room) => {
+    <div className="selectRoom">
+      <TableContainer >
+        <StyledTable >
+          <TableHead >
+            <StyledTableRow>
+              <StyledTableCell sx={{paddingY:3 ,fontSize:'1.75em',fontWeight:500}}>Rooms</StyledTableCell>
+              <StyledTableCell sx={{paddingY:3 ,fontSize:'1.75em',fontWeight:500}}>Amenities</StyledTableCell>
+              <StyledTableCell sx={{paddingY:3 ,fontSize:'1.75em',fontWeight:500}}>Price</StyledTableCell>
+            </StyledTableRow>
+          </TableHead>
+          <TableBody>
+            {details?.rooms &&
+              details.rooms.map((room) => {
                 if (room.numberOfRooms >= search.options.room) {
+                  const isExpanded = isRoomDescriptionExpanded(room._id);
+                  const cellColor = isExpanded ? 'lightblue' : '';
+
                   return (
-                    <TableRow key={room._id}>
-                      <TableCell>
+                    <StyledTableRow key={room._id}>
+                      <StyledTableCell cellColor={cellColor}>
                         <div className="roomDetailsContainer">
                           <Typography variant="h5">{room?.roomType}</Typography>
                           <div className="roomImgcontainer" style={{ width: '100%' }}>
                             <Carousel className="carousel">
-                              {room.images && room.images.map((img, idx) => (
-                                <Carousel.Item key={idx}>
-                                  <img
-                                    className="w-100 carouselImg"
-                                    src={img}
-                                    alt="room photos"
-                                    onClick={() => handleImgClick(idx)}
-                                  />
-                                </Carousel.Item>
-                              ))}
+                              {room.images &&
+                                room.images.map((img, idx) => (
+                                  <Carousel.Item key={idx}>
+                                    <img
+                                      className="w-100 carouselImg"
+                                      src={img}
+                                      alt="room photos"
+                                      onClick={() => handleImgClick(idx)}
+                                    />
+                                  </Carousel.Item>
+                                ))}
                             </Carousel>
                           </div>
                         </div>
-                      </TableCell>
-                      <TableCell>
+                      </StyledTableCell>
+                      <StyledTableCell cellColor={cellColor}>
                         <div className="roomFeaturesContainer">
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
                             <Bed />
                             <CompareArrows />
                           </Box>
-                          <Typography variant="body1" style={{ marginBottom: '10px', fontSize: '14px' }}>{room.roomDesc}</Typography>
-                          {/* <Typography variant="body1">{room.amenities}</Typography> */}
+                          <Typography variant="body1" style={{ marginBottom: '10px', fontSize: '14px' }}>
+                            {isExpanded ? room.roomDesc : `${room.roomDesc.slice(0, 200)}...`}
+                          </Typography>
+                          {room.roomDesc.length > 200 && (
+                            <ReadMoreButton onClick={() => handleReadMore(room._id)}>
+                              {isExpanded ? 'Read Less' : 'Read More'}
+                            </ReadMoreButton>
+                          )}
                         </div>
-                      </TableCell>
-                      <TableCell>
+                      </StyledTableCell>
+                      <StyledTableCell cellColor={cellColor}>
                         <div className="selectContainer">
                           <Typography variant="body1">₹ {room.price}</Typography>
                           <Button onClick={() => handleBooking(room._id)}>Select Room</Button>
                         </div>
-                      </TableCell>
-                    </TableRow>
+                      </StyledTableCell>
+                    </StyledTableRow>
                   );
                 }
                 return null;
               })}
-            </TableBody>
-          </Table>
-          <Toaster position="top-center" reverseOrder={false} />
-        </div>
+          </TableBody>
+        </StyledTable>
+      </TableContainer>
+      <Toaster position="top-center" reverseOrder={false} />
+    </div>
       </div>
 
 
